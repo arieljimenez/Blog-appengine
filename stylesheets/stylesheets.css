@@ -1,0 +1,160 @@
+body{
+     font-family: sans-serif;
+     width: 900px;
+     margin: 0 auto;
+     padding: 10px;
+}
+
+
+label{
+    display: block;
+    font-size: 20px;
+}
+
+input[type=text]{
+    width: 400px;
+    font-size: 20px;
+    padding: 2px;
+}
+
+input[type=submit]{
+    font-size: 24px;
+}
+
+textarea{
+    width: 400px;
+    height: 200px;
+    font-size: 17px;
+    font-family: monospace;
+}
+
+hr{
+    margin: 20px auto;
+}
+
+h1 {
+    display: block;
+    text-align: center;
+    color: black;
+    font-family: 'Prompt';
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover {
+    color: red;
+}
+
+h3 {
+    margin: 0px;
+    display: flex;
+}
+
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+footer {
+    padding-top: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: darkgray;
+}
+
+table#historial {
+    width: 900px;
+}
+
+
+table, th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+
+table tr:nth-child(even) {
+    background-color: #ddd;
+}
+
+table tr:nth-child(odd) {
+   background-color:#fff;
+}
+
+td {
+    max-width: 700px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.error {
+    color: red;
+}
+
+
+.post + .post{
+    margin-top: 20px;
+}
+
+.post-title{
+    font-family: 'Roboto';
+    font-weight: bold;
+    font-size: 17px;
+    position: relative;
+}
+
+.post-date {
+    font-size: 10px;
+    font-style: oblique;
+    color: gray;
+    position: absolute;
+    right: 0px;
+}
+.post-body {
+    margin: 0;
+    font-size: 15px;
+    font-family: 'Open Sans';
+}
+
+.footer {
+    list-style: none;
+    display: flex;
+}
+
+.footer li{
+    width: 33.33%;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.nav {
+    list-style: none;
+    display: flex;
+    font-family: monospace;
+    font-size: 13px;
+    position: fixed;
+    margin: 0px;
+    padding: 0px;
+    right: 0px;
+}
+
+.nav li {
+    padding-right: 10px;
+    /*padding-left: 10px;*/
+}
+
+.queried {
+    font-family: 'Open Sans';
+    font-size: 12px;
+    color: gray;
+    text-align: center;
+}

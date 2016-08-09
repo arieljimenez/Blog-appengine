@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>{{ title}}</title>
+        <link rel="stylesheet" href="/stylesheets/stylesheets.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans|Prompt|Roboto" rel="stylesheet">
+    </head>
+    <body>
+    <!-- menu -->
+        <ul class="nav">
+            {% if user_name %}
+                    {% if user_type == "admin" %}
+                        <li><a href="/adminpanel/">Admin Panel</a> | </li>
+                    {% else %}
+                        <li><a href="/">Home </a>|</li>
+                    {% endif %}
+
+                    <li><a href="/profile/">{{user_name}}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
+                {% else %}
+                    <li><a href="/">Home </a>|</li>
+                    <li><a href="/login">Login </a>|</li>
+                    <li><a href="/signup"> Sigup</a></li>
+            {% endif %}
+        </ul>
+
+        <br>
+
+
+
+    </body>
+</html>

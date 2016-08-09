@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Sign Up</title>
+        <style type="text/css">
+          .label {text-align: right}
+          .error {color: red}
+        </style>
+  </head>
+
+  <body>
+    <h2>Login to the Ariel is Blog</h2>
+    <form method="post">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="label">Username</td>
+                    <td><input type="text" name="username" value="{{user}}"></td>
+                    <td class="error">{{userError}}</td>
+                </tr>
+                <tr>
+                    <td class="label">Password</td>
+                    <td><input type="password" name="password" value=""></td>
+                    <td class="error">{{passError}}</td>
+                    <input type="hidden" name="next_url" value="{{next_url}}">
+                </tr>
+            </tbody>
+        </table>
+
+      <input type="submit">
+    </form>
+  </body>
+</html>
