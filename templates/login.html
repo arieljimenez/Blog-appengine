@@ -2,37 +2,29 @@
 
 <html>
     <head>
-        <title>Sign Up</title>
-        <style type="text/css">
-          .label {text-align: right}
-          .error {color: red}
-        </style>
+        <title>Login</title>
+        <link rel="stylesheet" href="/css/login.css">
   </head>
-
   <body>
-    <h2>Login to the Blog</h2>
 
-    <div class="login-form">
-      <form method="post">
-          <table>
-              <tbody>
-                  <tr>
-                      <td class="label">Username</td>
-                      <td><input type="text" name="username" value="{{user}}"></td>
-                      <td class="error">{{userError | safe}}</td>
-                  </tr>
-                  <tr>
-                      <td class="label">Password</td>
-                      <td><input type="password" name="password" value=""></td>
-                      <td class="error">{{passError}}</td>
-                      <input type="hidden" name="next_url" value="{{next_url}}">
-                  </tr>
-              </tbody>
-          </table>
+  {% block content %}
 
-        <input type="submit">
-      </form>
-
+    <div class="login-page">
+      <div class="form">
+        <form class="login-form"  method="post">
+          <p>Login to the Blog</p>
+          <hr>
+          <input type="text"  name="username" value="{{user}}" placeholder="username"/>
+          <small class="error">{{ userError | safe }}</small>
+          <input type="password" name="password" value="" placeholder="password"/>
+          <small class="error">{{ passError | safe }}</small>
+          <button type="submit">login</button>
+          <p class="message">Not registered? <a href="/signup">Create an account</a></p>
+          <input type="hidden" name="next_url" value="{{next_url}}">
+        </form>
+      </div>
     </div>
+
+    {% endblock %}
   </body>
 </html>

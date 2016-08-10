@@ -240,6 +240,15 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
     def error(self, number):
+        u = None
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if  not u:
+                self.redirect("/login") # bad cookie
+                return
 
         if number == 404:
             error = "The post that you looking for does not exist, try again bro or go <a href='/'>Home</a>."
@@ -248,7 +257,7 @@ class Handler(webapp2.RequestHandler):
         else:
             error = "uuups, i think that you broke something."
 
-        self.render("error.html", error=error, user=None)
+        self.render("error.html", error=error, user=u)
 
 
 ###################################################################
@@ -379,7 +388,7 @@ class SignUpHandler(Handler):
                     self.response.headers['Content-Type'] = 'text/plain'
                     self.response.headers.add_header('Set-Cookie', 'user_id=%s; Path=/' % new_cookie)
 
-                    self.redirect('/users/%s' % u.user_name)
+                    self.redirect('/user/%s' % u.user_name)
             else:
                 self.render_signup(user, email, userE, passE, verifyE, mailE)
 
@@ -404,7 +413,7 @@ class SignUpHandler(Handler):
 
                     # next_url = str(self.request.get('next_url'))
                     # self.redirect(next_url)
-                    self.redirect('/users/%s' % u.user_name)
+                    self.redirect('/user/%s' % u.user_name)
             else:
                 self.render_signup(user, email, userE, passE, verifyE)
 
@@ -419,10 +428,7 @@ class MainHandler(Handler):
         if user_cookie_str: # if cookie exist
             u = valid_cookie(user_cookie_str)
 
-            if u:
-                user_name = u.user_name
-                user_type = u.user_type
-            else:
+            if not u:
                 self.redirect("/login") # bad cookie
                 return
 
@@ -468,15 +474,11 @@ class UserPageHandler(Handler):
         if user_cookie_str: # if cookie exist
             u = valid_cookie(user_cookie_str)
 
-            if u:
-                user_name = u.user_name
-                user_type = u.user_type
-            else:
+            if not u:
                 self.redirect("/login") # bad cookie
                 return
 
         user_data = get_user_by_name(user[1:])
-        logging.error(user_data)
 
         if user_data:
             title = "%s is profile " % user_data.user_name
