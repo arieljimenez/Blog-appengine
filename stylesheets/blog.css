@@ -1,65 +1,147 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    /*border: 1px solid;
+    border-color: red;*/
+    z-index: 1;
+}
+
 body{
      font-family: sans-serif;
-     width: 800px;
+     width: 960px;
      margin: 0 auto;
-     padding: 10px;
+     padding-top: 10px;
 }
 
-
-label{
-    display: block;
-    font-size: 20px;
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
-input[type=text]{
-    width: 400px;
-    font-size: 20px;
-    padding: 2px;
+a:hover {
+    color: red;
 }
 
-input[type=submit]{
-    font-size: 24px;
-}
-
-textarea{
-    width: 400px;
-    height: 200px;
-    font-size: 17px;
-    font-family: monospace;
-}
-
-hr{
+hr {
     margin: 20px auto;
 }
 
 h1 {
     display: block;
     text-align: center;
-    color: blue;
+    color: black;
+    font-family: 'Prompt';
 }
 
-.error {
-    color: red;
-}
 
-.post + .post{
-    margin-top: 20px;
-}
-
-.post-title{
-    font-weight: bold;
-    font-size: 17px;
-}
-
-.post-body {
-    margin: 0;
-    font-size: 15px;
-}
-
-.post-date {
-    font-size: 10px;
-    font-style: oblique;
-    color: gray;
-    text-align: right;
+h3 {
+    margin: 0px;
     display: flex;
+}
+
+input {
+    font-family: 'Prompt', "Tahoma",  sans-serif;
+    font-size: 20px;
+}
+#headband {
+    background-color: black;
+    text-align: right;
+    padding: 0px;
+    margin: 5px;
+    height: 150px;
+}
+
+#headband img {
+    height: 100%;
+    z-index: -1;
+}
+
+#no-post {
+    height: 300px;
+}
+
+#no-post h3 {
+    padding-top: 100px;
+}
+
+#chart_div {
+    right: 0px;
+}
+
+#profile {
+    display: flex;
+}
+
+.profile{
+    height: 300px;
+    font-family: sans-serif;
+    font-size: 20px;
+}
+
+.profile tr {
+    height: 20%;
+    text-align: left;
+}
+
+.profile tr td:first-child {
+    text-align: right;
+    width: 40%;
+    padding-right: 5px;
+}
+
+.center {
+    display: block;
+    text-align: center;
+}
+
+.content-abr {
+    max-width: 700px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav {
+    list-style: none;
+    display: flex;
+    font-family: monospace;
+    font-size: 13px;
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    right: 0px;
+}
+
+.nav li {
+    padding-right: 10px;
+}
+
+.round {
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+    padding: 5px;
+    border: 1px solid #000;
+}
+
+.footer {
+    list-style: none;
+    display: fixed;
+    font-size: 14px;
+    text-align: center;
+    font-family: "Consolas";
+    padding: 0px;
+    margin: 0px;
+    bottom: 0px;
+}
+
+.footer li{
+    width: 33.33%;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.img-center {
+    display: block;
+    margin: auto;
 }

@@ -10,25 +10,29 @@
   </head>
 
   <body>
-    <h2>Login to the Ariel is Blog</h2>
-    <form method="post">
-        <table>
-            <tbody>
-                <tr>
-                    <td class="label">Username</td>
-                    <td><input type="text" name="username" value="{{user}}"></td>
-                    <td class="error">{{userError}}</td>
-                </tr>
-                <tr>
-                    <td class="label">Password</td>
-                    <td><input type="password" name="password" value=""></td>
-                    <td class="error">{{passError}}</td>
-                    <input type="hidden" name="next_url" value="{{next_url}}">
-                </tr>
-            </tbody>
-        </table>
+    <h2>Login to the Blog</h2>
 
-      <input type="submit">
-    </form>
+    <div class="login-form">
+      <form method="post">
+          <table>
+              <tbody>
+                  <tr>
+                      <td class="label">Username</td>
+                      <td><input type="text" name="username" value="{{user}}"></td>
+                      <td class="error">{{userError | safe}}</td>
+                  </tr>
+                  <tr>
+                      <td class="label">Password</td>
+                      <td><input type="password" name="password" value=""></td>
+                      <td class="error">{{passError}}</td>
+                      <input type="hidden" name="next_url" value="{{next_url}}">
+                  </tr>
+              </tbody>
+          </table>
+
+        <input type="submit">
+      </form>
+
+    </div>
   </body>
 </html>

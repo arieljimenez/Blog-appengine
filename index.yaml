@@ -21,6 +21,11 @@ indexes:
   properties:
   - name: modified
 
+- kind: Blog_Posts
+  ancestor: yes
+  properties:
+  - name: modified
+
 - kind: Pages
   ancestor: yes
   properties:

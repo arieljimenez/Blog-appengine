@@ -3,30 +3,67 @@
 <html>
     <head>
         <title>{{ title}}</title>
-        <link rel="stylesheet" href="/stylesheets/stylesheets.css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Prompt|Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="/stylesheets/blog.css">
+
+        {% if user_profile %}
+        <!-- <script type="text/javascript" src="/js/loader.js"></script> -->
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        {% endif %}
     </head>
     <body>
-    <!-- menu -->
+        <!-- menu -->
         <ul class="nav">
-            {% if user_name %}
-                    {% if user_type == "admin" %}
-                        <li><a href="/adminpanel/">Admin Panel</a> | </li>
-                    {% else %}
-                        <li><a href="/">Home </a>|</li>
-                    {% endif %}
-
-                    <li><a href="/profile/">{{user_name}}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
+            {% if user.user_name %}
+                <li><a href="/pages/new">New Post</a> | </li>
+                {% if user.user_type == "admin" %}
+                    <li><a href="/adminpanel/">Admin Panel</a> | </li>
                 {% else %}
                     <li><a href="/">Home </a>|</li>
-                    <li><a href="/login">Login </a>|</li>
-                    <li><a href="/signup"> Sigup</a></li>
+                {% endif %}
+                <li><a href="/user/{{user.user_name}}">{{user.user_name}}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
+            {% else %}
+                <li><a href="/">Home </a>|</li>
+                <li><a href="/login">Login </a>|</li>
+                <li><a href="/signup"> Sigup</a></li>
             {% endif %}
         </ul>
-
         <br>
+        <!-- /menu -->
 
+        <!-- headband -->
+        <div id="headband">
+            <img src="/img/miku-headband.jpg" alt="headband">
+        </div>
+        <!-- /headband -->
 
+        {% block content %}
+
+            <div class="posts">
+                <h1>Lastest Posts:</h1>
+
+                {% if posts %}
+
+                    {% for p in posts %}
+                        <h3>{{p.title}}</h3>
+                        <hr>
+                        <p class="content-abr">{{p.content}}</p>
+                    {% endfor %}
+
+                {% else %}
+                    <div id="no-post">
+                        <h3 class="center">No post alredy. Be the first in make one! <a href="/post/new"> Clic here!</a></h3>
+                    </div>
+
+                {% endif %}
+            </div>
+
+        {% endblock %}
+
+        <hr>
+        <div class="footer">
+            <p>[ Made with love in Python + AJAX + HTML & CCS ]</p>
+        </div>
 
     </body>
 </html>

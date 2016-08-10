@@ -1,0 +1,64 @@
+{% extends 'blog.html' %}
+
+{% block content %}
+
+<h1 style="text-decoration: underline;">Profile in detail</h1>
+<div id="profile">
+    <table class="profile">
+        <tbody>
+            <tr>
+                <td class="profile-data"> Username </td>
+                <td><input type="text" name="username" value="{{user_profile.user_name}}" disabled=""></td>
+            </tr>
+            <tr>
+                <td> Mail </td>
+                <td><input type="text" name="username" value="{{user_profile.user_mail}}" disabled=""></td>
+            </tr>
+            <tr>
+                <td> Comments </td>
+                <td><span class="round">{{user_profile.comments}}</span></td>
+            </tr>
+            <tr>
+                <td>Posts</td>
+                <td><span class="round">{{user_profile.posts}}</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <div id="chart_div"></div>
+</div>
+
+<!-- bad mode, later move to a blog.js and make a function to do this -->
+<script type="text/javascript">
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ["{{user_profile.user_name}}", {{user_profile.comments + user_profile.posts }}],
+      ['Others', {{ totalposts - (user_profile.comments + user_profile.posts )}}]
+    ]);
+
+    // Set chart options
+    var options = {'title':'Activity Meter',
+                   'width':400,
+                   'height':300};
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+    }
+</script>
+{% endblock %}

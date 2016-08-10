@@ -49,7 +49,7 @@ MOD_DATE_FORMAT = "%a %b %d %H:%M:%S %Y"
 def get_dbkey(name = 'default'):
     return db.Key.from_path("blog-ariel", name)
 
-class Blog_Pages(db.Model):
+class Blog_Posts(db.Model):
     title   = db.StringProperty(required = True)
     content = db.TextProperty(required = True)
     topic   = db.StringProperty(required = True)
@@ -63,6 +63,8 @@ class Blog_Users(db.Model):
     user_type = db.StringProperty(required = True)
     user_mail = db.StringProperty(required = False)
     siginup   = db.DateTimeProperty(auto_now_add = True)
+    comments  = db.IntegerProperty(required = True)
+    posts     = db.IntegerProperty(required = True)
 
 ########################################################## PUBLICS VOIDS #
 
@@ -115,7 +117,9 @@ def insert_new_user(user_name, user_pass, user_mail=None):
                     user_name = user_name,
                     user_pass = str(user_pass),
                     user_mail = user_mail,
-                    user_type = "user")
+                    user_type = "user",
+                    comments  = 0,
+                    posts     = 0)
     u.put()
 
     user_id = str(u.key().id())
@@ -158,42 +162,44 @@ def valid_cookie(cookie):
         return  blog_users[user_id]
 
 def make_cache():
-    ############ pages
-    blog_pages = {}
+    ############ posts
+    blog_posts = {}
 
     time_spend = time.time()
-    pages = db.GqlQuery("SELECT * FROM Blog_Pages WHERE ANCESTOR IS :1 ORDER BY modified ASC", get_dbkey())
+    posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY modified ASC", get_dbkey())
 
-    for page in pages:
-        if not page.title in blog_pages:
-            blog_pages[page.title] = {}
+    for post in posts:
+        if not post.title in blog_posts:
+            blog_posts[post.title] = {}
 
-        v = len(blog_pages[page.title])
+        v = len(blog_posts[post.title])
 
-        blog_pages[page.title][v]= {"id" : str(page.key().id()),
-                                    "title": page.title,
-                                    "topic": page.topic,
-                                    "content": page.content,
-                                    "user": page.user,
-                                    "modified": page.modified.strftime(MOD_DATE_FORMAT),
-                                    "state": page.estate}
+        blog_posts[post.title][v]= {"id" : str(post.key().id()),
+                                    "title": post.title,
+                                    "topic": post.topic,
+                                    "content": post.content,
+                                    "user": post.user,
+                                    "modified": post.modified.strftime(MOD_DATE_FORMAT),
+                                    "state": post.estate}
 
-    memcache.set("blog_pages", blog_pages)
-    logging.error("took %s caching all the pages " % (time.time() - time_spend))
+    memcache.set("blog_posts", blog_posts)
+    logging.error("took %s caching all the posts " % (time.time() - time_spend))
 
-    ############ users
+    ############ users // page
     blog_users = {}
     time_spend = time.time()
     users = db.GqlQuery("SELECT * FROM Blog_Users WHERE ANCESTOR IS :1",  get_dbkey())
 
 
     for user in users:
-         blog_users[str(user.key().id())] =   user
+         blog_users[str(user.key().id())] = user
 
     if len(blog_users) == 0:
         admin = Blog_Users( user_name="ariel",
                             user_pass= hash_str("ariel"),
-                            user_type = "admin")
+                            user_type = "admin",
+                            comments  = 0,
+                            posts     = 0)
         admin.put()
         blog_users[str(admin.key().id())] =   admin
 
@@ -232,6 +238,18 @@ class Handler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
+
+    def error(self, number):
+
+        if number == 404:
+            error = "The post that you looking for does not exist, try again bro or go <a href='/'>Home</a>."
+        elif number == 500:
+            error = "User does not exist or is currently invalid."
+        else:
+            error = "uuups, i think that you broke something."
+
+        self.render("error.html", error=error, user=None)
+
 
 ###################################################################
 
@@ -289,7 +307,7 @@ class LoginHandler(Handler):
                     passE = "The pass is invalid, try again."
                     self.render_login(user, userE, passE)
             else:
-                userE = "The user is invalid, try again with a valid user or signup."
+                userE = "The user is invalid, try again with a valid user or <a href='/signup'>signup</a>."
                 self.render_login(user, userE, passE)
 
         else:
@@ -309,7 +327,14 @@ class SignUpHandler(Handler):
         if next_url == "/signup":
             next_url = "/"
 
-        self.render("signup.html", user = user, email = email, userError = userError, passError = passError, verifyError = verifyError, mailError = mailError, next_url=next_url)
+        self.render("signup.html",
+                    user = user,
+                    email = email,
+                    userError = userError,
+                    passError = passError,
+                    verifyError = verifyError,
+                    mailError = mailError,
+                    next_url=next_url)
 
     def get(self):
         next_url = self.request.headers.get('referer', '/')
@@ -354,7 +379,7 @@ class SignUpHandler(Handler):
                     self.response.headers['Content-Type'] = 'text/plain'
                     self.response.headers.add_header('Set-Cookie', 'user_id=%s; Path=/' % new_cookie)
 
-                    self.redirect('/')
+                    self.redirect('/users/%s' % u.user_name)
             else:
                 self.render_signup(user, email, userE, passE, verifyE, mailE)
 
@@ -377,17 +402,18 @@ class SignUpHandler(Handler):
                     self.response.headers['Content-Type'] = 'text/plain'
                     self.response.headers.add_header('Set-Cookie', 'user_id=%s; Path=/' % new_cookie)
 
-                    next_url = str(self.request.get('next_url'))
-
-                    self.redirect(next_url)
+                    # next_url = str(self.request.get('next_url'))
+                    # self.redirect(next_url)
+                    self.redirect('/users/%s' % u.user_name)
             else:
                 self.render_signup(user, email, userE, passE, verifyE)
 
 ##########################################################################################################
 
 class MainHandler(Handler):
-    def render_page(self, page, user_type="anon", title="Home"):
+    def render_post(self, post, user_type="anon", title="Home"):
         user_name = None
+        u = None
         user_cookie_str = self.request.cookies.get('user_id')
 
         if user_cookie_str: # if cookie exist
@@ -400,50 +426,84 @@ class MainHandler(Handler):
                 self.redirect("/login") # bad cookie
                 return
 
-        if page:
-            title = page["title"]
+        if post:
+            title = post["title"]
 
         self.render("blog.html",
-                    page=page,
+                    post=post,
                     title=title,
-                    user_name=user_name,
-                    user_type=user_type)
+                    user= u)
 
 
     def get(self, title="/"):
 
-        blog_pages = memcache.get("blog_pages")
+        blog_posts = memcache.get("blog_posts")
 
-        if blog_pages is None:
+        if blog_posts is None:
             make_cache()
-            blog_pages = memcache.get("blog_pages")
+            blog_posts = memcache.get("blog_posts")
 
-        if title in blog_pages: #
-            page = blog_pages[title]
-            page["content"] = sana_html(page["content"])
-            self.render_page(page=page, mod=False)
+        if title in blog_posts: #
+            post = blog_posts[title]
+            post["content"] = sana_html(post["content"])
+            self.render_post(post=post, mod=False)
             return
 
         elif title == "/":
-            self.render_page(page=None)
+            self.render_post(post=None)
             return
 
+        else:
+            self.error(404)
+            # error = "The post that you looking for does not exist, try again bro or go <a href='/'>Home</a>."
+            # self.render("error.html", error=error, user=None)
 
-        logging.error("error : %s" % title)
-        self.error(404)
-
-class NewPage(Handler):
-    def get(self):
-        pass
-
-
-class PageHandler(Handler):
-    def get(self):
-        pass
 
 class UserPageHandler(Handler):
+    def get(self, user):
+        user_name = None
+        u = None
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if u:
+                user_name = u.user_name
+                user_type = u.user_type
+            else:
+                self.redirect("/login") # bad cookie
+                return
+
+        user_data = get_user_by_name(user[1:])
+        logging.error(user_data)
+
+        if user_data:
+            title = "%s is profile " % user_data.user_name
+
+            #totalposts = len(memcache.get("blog_posts"))
+            totalposts = 50;
+
+            self.render("profile.html",
+                        title=title,
+                        user = u,
+                        user_profile = user_data,
+                        totalposts=totalposts)
+        else:
+            self.error(500)
+            # error = "User does not exist or is currently invalid."
+            # self.render("error.html", error=error, user=None)
+
+
+class NewPost(Handler):
     def get(self):
         pass
+
+
+class PostHandler(Handler):
+    def get(self):
+        pass
+
 
 class AdminPanel(Handler):
     def get(self):
@@ -455,8 +515,9 @@ app = webapp2.WSGIApplication([('/',            MainHandler),
                                ('/login',       LoginHandler),
                                ('/logout',      LogoutHandler),
                                ('/signup',      SignUpHandler),
-                               ('/profile'+     PAGE_RE, UserPageHandler),
+                               ('/user'+     PAGE_RE, UserPageHandler),
                                ('/adminpanel',  AdminPanel),
-                               ('/pages/_new'+ PAGE_RE, NewPage),
-                               ('/pages'+ PAGE_RE, PageHandler)
+                               ('/posts/new'+ PAGE_RE, NewPost),
+                               ('/posts'+ PAGE_RE, MainHandler),
+                               (PAGE_RE, MainHandler),
                                 ], debug=True)
