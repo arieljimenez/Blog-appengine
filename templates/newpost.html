@@ -1,0 +1,44 @@
+{% extends 'blog.html' %}
+
+{% block content %}
+<h1>New Post</h1>
+<hr>
+
+<div class="form round">
+    <form method="post">
+        <table class="newpost-form">
+            <tbody>
+                <tr>
+                    <td> Title </td>
+                    <td><input type="text" name="title" value="{{title}}" placeholder="Title of the post"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><small class="error">{{titleError}}</small></td>
+                </tr>
+                <tr>
+                    <td>Topic</td>
+                    <td><input type="text" name="topic" value="{{topic}}" placeholder="life, ovnis, anime, etc"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><small class="error">{{topicError}}</small></td>
+                </tr>
+                <tr>
+                    <td>Content</td>
+                    <td><textarea name="content" style="height: 100px;" placeholder="Once upon a time...">{{content}}</textarea></td>
+                </tr>
+                    <td></td>
+                    <td><small class="error">{{contentError}}</small></td>
+                <tr>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><button class="round" type="submit">create</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+{% endblock %}

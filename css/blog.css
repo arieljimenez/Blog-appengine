@@ -39,10 +39,20 @@ h3 {
     display: flex;
 }
 
-input {
-    font-family: 'Prompt', "Tahoma",  sans-serif;
-    font-size: 20px;
+input, textarea {
+    font-size: 16px;
+    font-family: "Roboto", sans-serif;
+    background: #f2f2f2;
+    box-sizing: border-box;
+    outline: 0;
+    border: 0;
+    margin: 0 5px 5px;
+    padding: 15px;
+    box-sizing: border-box;
+    width: 100%;
+    resize: none;
 }
+
 
 #headband {
     background-color: black;
@@ -118,9 +128,9 @@ input {
 }
 
 .round {
-    -moz-border-radius: 20px;
-    -webkit-border-radius: 20px;
-    border-radius: 20px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
     padding: 5px;
     border: 1px solid #000;
 }
@@ -145,6 +155,88 @@ input {
 .img-center {
     display: block;
     margin: auto;
+}
+.form {
+  position: relative;
+  margin: 0 auto;
+  background: #FFFFFF;
+  max-width: 700px;
+  padding: 25px;
+  text-align: left;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  border: 0;
+  padding: 10px;
+  margin: 5px;
+  color: #FFFFFF;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.newpost-form {
+    width: 100%;
+}
+
+.newpost-form td:first-child {
+    text-align: right;
+}
+
+.error {
+    color: red;
+    font-weight: 500;
+}
+
+.post {
+    background-color: #e2e4e3;
+    border-color: dodgerblue;
+}
+
+.post-header {
+    display: flex;
+    font-family: "Roboto", sans-serif;
+    background-color: #034405;
+    color: white;
+    padding: 10px;
+
+    -moz-border-radius: 15px 15px 0 0;
+    -webkit-border-radius: 15px 15px 0 0;
+    border-radius: 15px 15px 0 0px;
+    padding: 5px;
+}
+
+.post-data {
+    width: 70%;
+    margin: 5px;
+}
+
+.post-score {
+    text-align: right;
+    width: 30%;
+}
+
+.post-content {
+    margin: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-family: "Slabo 27px", sans-serif;
+}
+
+.post-comments {
+
+    font-family: "Open Sans", "Prompt", Helvetica, Tahoma;
+    padding: 10px;
+    margin: 5px;
+    background-color: #d4e5ef;
+
+    -moz-border-radius: 0 0 15px 15px;
+    -webkit-border-radius: 0 0 15px 15px;
+    border-radius: 0 0 15px 15px;
 }
 
 /* ###################################### */

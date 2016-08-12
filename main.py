@@ -56,6 +56,8 @@ class Blog_Posts(db.Model):
     user    = db.StringProperty(required = True)
     state   = db.BooleanProperty(True)
     modified= db.DateTimeProperty(auto_now_add = True)
+    comments= db.IntegerProperty()
+    views   = db.IntegerProperty()
 
 class Blog_Users(db.Model):
     user_name = db.StringProperty(required = True)
@@ -166,24 +168,13 @@ def make_cache():
     blog_posts = {}
 
     time_spend = time.time()
-    posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY modified ASC", get_dbkey())
+    posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1", get_dbkey())
 
-    for post in posts:
-        if not post.title in blog_posts:
-            blog_posts[post.title] = {}
-
-        v = len(blog_posts[post.title])
-
-        blog_posts[post.title][v]= {"id" : str(post.key().id()),
-                                    "title": post.title,
-                                    "topic": post.topic,
-                                    "content": post.content,
-                                    "user": post.user,
-                                    "modified": post.modified.strftime(MOD_DATE_FORMAT),
-                                    "state": post.estate}
+    for p in posts:
+        blog_posts[str(p.key().id())] = p
 
     memcache.set("blog_posts", blog_posts)
-    logging.error("took %s caching all the posts " % (time.time() - time_spend))
+    logging.error("took %s caching all the %s posts " % (time.time() - time_spend, len(blog_posts)))
 
     ############ users // page
     blog_users = {}
@@ -201,11 +192,11 @@ def make_cache():
                             comments  = 0,
                             posts     = 0)
         admin.put()
-        blog_users[str(admin.key().id())] =   admin
+        blog_users[str(admin.key().id())] = admin
 
         logging.error("admin created")
 
-    logging.error("took %s caching all the users " % (time.time() - time_spend))
+    logging.error("took %s caching all the %s users " % (time.time() - time_spend, len(blog_users)))
 
 
     memcache.set("blog_users", blog_users)
@@ -222,6 +213,16 @@ def sana_html(texto):
     texto = texto.replace("<input", "<nope")
 
     return texto
+
+def getPostbytitle(title):
+    blog_posts = memcache.get("blog_posts")
+
+    for key, value in blog_posts.items():
+        if value.title == title:
+            return value
+
+def cal_rec_post():
+    pass
 
 ############################################################################################################
 ###################################################### HANDLERS ############################################
@@ -420,9 +421,7 @@ class SignUpHandler(Handler):
 ##########################################################################################################
 
 class MainHandler(Handler):
-    def render_post(self, post, user_type="anon", title="Home"):
-        user_name = None
-        u = None
+    def render_post(self, post, title, u = None):
         user_cookie_str = self.request.cookies.get('user_id')
 
         if user_cookie_str: # if cookie exist
@@ -432,8 +431,9 @@ class MainHandler(Handler):
                 self.redirect("/login") # bad cookie
                 return
 
-        if post:
-            title = post["title"]
+        if not title == "Home" :
+            title = post.title[1:]
+
 
         self.render("blog.html",
                     post=post,
@@ -443,20 +443,22 @@ class MainHandler(Handler):
 
     def get(self, title="/"):
 
+        title = title.replace(" ", "_")
+
         blog_posts = memcache.get("blog_posts")
 
         if blog_posts is None:
             make_cache()
             blog_posts = memcache.get("blog_posts")
 
-        if title in blog_posts: #
-            post = blog_posts[title]
-            post["content"] = sana_html(post["content"])
-            self.render_post(post=post, mod=False)
+        post = getPostbytitle(title)
+
+        if title == "/":
+            self.render_post(post=None, title="Home")
             return
 
-        elif title == "/":
-            self.render_post(post=None)
+        elif post:
+            self.render_post(post=post, title=title)
             return
 
         else:
@@ -498,8 +500,100 @@ class UserPageHandler(Handler):
 
 
 class NewPost(Handler):
+    def render_newpost(self, u = None, title='', topic='', content='', titleError = '', topicError = '', contentError = ''):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login")# bad cookie or user nor logged
+                return
+
+        self.render("newpost.html",
+                    posts       = None,
+                    user        = u,
+                    title       = title,
+                    topic       = topic,
+                    content     = content,
+                    titleError  = titleError,
+                    topicError  = topicError,
+                    contentError= contentError)
+
+
     def get(self):
-        pass
+        self.render_newpost()
+
+
+    def post(self):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login")
+                return
+
+        title   = ''
+        topic   = ''
+        content = ''
+        user    = u.user_name
+
+        titleError   = ''
+        topicError   = ''
+        contentError = ''
+
+        allgood = True
+
+        title   = cgi.escape(self.request.get('title'), quote= True)
+        topic   = cgi.escape(self.request.get('topic'), quote= True)
+        content = cgi.escape(self.request.get('content'), quote= True)
+
+        if not title:
+            titleError = "The Post must have a title! (face palm)"
+            allgood = False
+
+        if not topic:
+            topicError = "Did you know that a post MUST have a topic?"
+            allgood = False
+
+        if not content:
+            contentError = "Are you sure that you want to post with no content? LoL"
+            allgood = False
+
+        if allgood:
+            blog_posts = memcache.get("blog_posts")
+
+            title = "/" + title.replace(" ", "_")
+
+            post = Blog_Posts( parent = get_dbkey(),
+                               title    = title,
+                               topic    = topic,
+                               content  = content,
+                               user     = u.user_name,
+                               state    = True,
+                               comments = 0,
+                               views    = 0)
+            post.put()
+
+            blog_posts[str(post.key().id())] = post
+            memcache.set("blog_posts", blog_posts)
+
+            cal_rec_post()
+
+            self.redirect("/post%s" % title)
+            return
+        else:
+            self.render_newpost(title       = title,
+                                topic       = topic,
+                                content     = content,
+                                titleError  = titleError,
+                                topicError  = topicError,
+                                contentError= contentError)
+
+
+
 
 
 class PostHandler(Handler):
@@ -519,7 +613,7 @@ app = webapp2.WSGIApplication([('/',            MainHandler),
                                ('/signup',      SignUpHandler),
                                ('/user'+     PAGE_RE, UserPageHandler),
                                ('/adminpanel',  AdminPanel),
-                               ('/posts/new'+ PAGE_RE, NewPost),
-                               ('/posts'+ PAGE_RE, MainHandler),
+                               ('/post/new/?', NewPost),
+                               ('/post'+ PAGE_RE, MainHandler),
                                (PAGE_RE, MainHandler),
                                 ], debug=True)
