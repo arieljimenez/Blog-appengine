@@ -83,6 +83,10 @@ input, textarea {
     display: flex;
 }
 
+#view-posts, #comm-posts{
+    padding-top: 20px;
+}
+
 .profile{
     height: 300px;
     font-family: sans-serif;
@@ -228,15 +232,71 @@ input, textarea {
 }
 
 .post-comments {
-
     font-family: "Open Sans", "Prompt", Helvetica, Tahoma;
     padding: 10px;
     margin: 5px;
     background-color: #d4e5ef;
-
     -moz-border-radius: 0 0 15px 15px;
     -webkit-border-radius: 0 0 15px 15px;
     border-radius: 0 0 15px 15px;
 }
 
+.user-comments + .user-comments {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.comment {
+  position: relative;
+  margin: 0 auto;
+  background: #FFFFFF;
+  padding: 25px;
+  text-align: left;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.comment button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  border: 0;
+  padding: 10px;
+  margin: 5px;
+  color: #FFFFFF;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.topic {
+    font-family: "Consolas";
+    color: yellow;
+}
+
+.user_name {
+    font-family: "Consolas";
+    color: orangered;
+}
+
+
+.ranking-posts {
+    width: 100%;
+    border: 1px solid;
+    border-collapse: collapse
+    padding: 5px;
+    text-align: left;
+    display: table;
+}
+
+.ranking-posts tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.text-center {
+    text-align: center;
+}
+
 /* ###################################### */
+/*
+ las esquinas 1 y 3 seran las
+*/

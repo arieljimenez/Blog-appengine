@@ -68,6 +68,15 @@ class Blog_Users(db.Model):
     comments  = db.IntegerProperty(required = True)
     posts     = db.IntegerProperty(required = True)
 
+class Comments(db.Model):
+    user_id     = db.IntegerProperty(required = True)
+    user_name   = db.StringProperty(required = True)
+    post_id     = db.IntegerProperty(required = True)
+    post_title  = db.StringProperty(required = True)
+    post_comment= db.TextProperty(required = True)
+    state       = db.BooleanProperty(required = True)
+    created     = db.DateTimeProperty(auto_now_add = True)
+
 ########################################################## PUBLICS VOIDS #
 
 def verify_pass(passw, verify):
@@ -181,12 +190,12 @@ def make_cache():
     time_spend = time.time()
     users = db.GqlQuery("SELECT * FROM Blog_Users WHERE ANCESTOR IS :1",  get_dbkey())
 
-
     for user in users:
          blog_users[str(user.key().id())] = user
 
     if len(blog_users) == 0:
-        admin = Blog_Users( user_name="ariel",
+        admin = Blog_Users( parent = get_dbkey(),
+                            user_name="ariel",
                             user_pass= hash_str("ariel"),
                             user_type = "admin",
                             comments  = 0,
@@ -198,8 +207,37 @@ def make_cache():
 
     logging.error("took %s caching all the %s users " % (time.time() - time_spend, len(blog_users)))
 
-
     memcache.set("blog_users", blog_users)
+
+    # COMMENTS DOC
+    # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
+    # comments[idpost][post_title][idcomment]                                       get
+    # comments[idpost][post_title][idcomment] = obj_comment                         set
+
+    time_spend = time.time() #in your marks....reeedy...GO!
+    blog_comments = {}
+
+    comments = db.GqlQuery("SELECT * FROM Comments WHERE ANCESTOR IS :1",  get_dbkey())
+
+    for comment in comments:
+        if not comment.post_id in blog_comments:
+            blog_comments[str(comment.post_id)] = { comment.post_title : { str(comment.key().id()) : comment } }
+            #blog_comments[comment.post_id][comment.post_title] = { comment.key().id(): comment }
+        else:
+            blog_comments[comment.post_id][comment.post_title][comment.key().id()] = comment
+
+    memcache.set("blog_comments", blog_comments)
+
+    logging.error("took %s caching all the %s comments " % (time.time() - time_spend, len(blog_comments)))
+
+    #rankings
+    time_spend = time.time()
+
+    calc_posts_statics()
+
+    logging.error("took %s caching the posts rankings" % (time.time() - time_spend))
+
+
 
 def sana_html(texto):
     texto = texto.replace("<script", "<nope")
@@ -214,15 +252,99 @@ def sana_html(texto):
 
     return texto
 
-def getPostbytitle(title):
+def getPostbytitle(title, view = False):
     blog_posts = memcache.get("blog_posts")
 
-    for key, value in blog_posts.items():
+    if blog_posts is None:
+        make_cache()
+        blog_posts = memcache.get("blog_posts")
+
+    for key, value in blog_posts.iteritems():
         if value.title == title:
+
+            if view:
+                value.views += 1
+                value.put() #update db
+
+                blog_posts[key] = value # update cache
+                memcache.set("blog_posts", blog_posts)
+
             return value
 
-def cal_rec_post():
-    pass
+
+def getCommentsbyTitle(title):
+    blog_comments = memcache.get("blog_comments")
+
+    if blog_comments is None:
+        make_cache()
+        blog_comments = memcache.get("blog_comments")
+
+    for key, value in blog_comments.items():
+        for key2, value2 in value.items():
+            if key2 == title:
+                return value2
+
+
+def calc_posts_statics(calc="all"):
+
+
+    if calc == "comments" or calc == "all":
+        topten_comm_posts = []
+        comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY comments DESC LIMIT 10",  get_dbkey())
+
+        for post in comm_posts:
+            topten_comm_posts.append([post.title, post.comments, post])
+
+        memcache.set("topten_comm_posts", topten_comm_posts)
+
+
+    if calc == "views" or calc == "all":
+        topten_view_posts = []
+        view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY views DESC LIMIT 10",  get_dbkey())
+
+        for post in view_posts:
+            topten_view_posts.append([post.title, post.views, post])
+
+        memcache.set("topten_view_posts", topten_view_posts)
+
+    # for key, value in blog_posts.items():
+    #     logging.error("Error %s / %s " % (key, value))
+
+    # for post_id, post in blog_posts.items():
+
+    #     if calc == "comments" or calc == "all":
+    #         for x in range(0, len(topten_comm_posts)):
+    #             if post.comments >= topten_comm_posts[x][1]:
+    #                 topten_comm_posts.pop()
+    #                 topten_comm_posts.insert(x, [post.title, post.comments, post])
+    #                 break
+
+    #         memcache.set("topten_comm_posts", topten_comm_posts)
+
+    #     if calc == "views" or calc == "all":
+    #         for x in range(0, len(topten_view_posts)):
+
+    #             if post.title == topten_view_posts[x][0]:
+    #                 if post.views > topten_view_posts[x][1]:
+    #                     topten_view_posts[x][1] = post.views
+    #                     topten_view_posts[x][2] = post
+    #                     break
+
+    #             elif post.views > topten_view_posts[x][1]:
+    #                 if len(topten_view_posts) > 10:
+    #                     topten_view_posts.pop()
+
+    #                 topten_view_posts.insert(x, [post.title, post.views, post])
+    #                 break
+
+    #             elif len(topten_view_posts) < 10:
+    #                 topten_view_posts.append([post.title, post.views, post])
+    #                 break
+
+
+
+    #         memcache.set("topten_view_posts", topten_view_posts)
+
 
 ############################################################################################################
 ###################################################### HANDLERS ############################################
@@ -421,7 +543,7 @@ class SignUpHandler(Handler):
 ##########################################################################################################
 
 class MainHandler(Handler):
-    def render_post(self, post, title, u = None):
+    def render_post(self, post, title, u = None, comments = None, commentError = ""):
         user_cookie_str = self.request.cookies.get('user_id')
 
         if user_cookie_str: # if cookie exist
@@ -432,13 +554,29 @@ class MainHandler(Handler):
                 return
 
         if not title == "Home" :
+            comments = getCommentsbyTitle(title)
+
+            if comments:
+                comments = OrderedDict(sorted(comments.items(), reverse=True))
+
             title = post.title[1:]
 
+            topten_comm_posts = None
+            topten_view_posts = None
+
+        else:
+            calc_posts_statics("views")
+            topten_comm_posts = memcache.get("topten_comm_posts")
+            topten_view_posts = memcache.get("topten_view_posts")
 
         self.render("blog.html",
-                    post=post,
-                    title=title,
-                    user= u)
+                    post  = post,
+                    title = title,
+                    user  = u,
+                    comments = comments,
+                    commentError = commentError,
+                    topten_comm_posts = topten_comm_posts,
+                    topten_view_posts = topten_view_posts)
 
 
     def get(self, title="/"):
@@ -451,7 +589,7 @@ class MainHandler(Handler):
             make_cache()
             blog_posts = memcache.get("blog_posts")
 
-        post = getPostbytitle(title)
+        post = getPostbytitle(title, view = True)
 
         if title == "/":
             self.render_post(post=None, title="Home")
@@ -465,6 +603,68 @@ class MainHandler(Handler):
             self.error(404)
             # error = "The post that you looking for does not exist, try again bro or go <a href='/'>Home</a>."
             # self.render("error.html", error=error, user=None)
+
+
+    def post(self, post_title):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login") # bad cookie
+                return
+
+        comment = cgi.escape(self.request.get('comment'), quote= True)
+
+        post = getPostbytitle(post_title)
+
+        if comment:
+            c = Comments( parent      = get_dbkey(),
+                          user_id     = u.key().id(),
+                          user_name   = u.user_name,
+                          post_id     = post.key().id(),
+                          post_title  = post_title,
+                          post_comment= comment,
+                          state       = True)
+            c.put()
+
+            blog_comments = memcache.get("blog_comments")
+
+            if blog_comments is None:
+                make_cache()
+                blog_comments = memcache.get("blog_comments")
+
+            if blog_comments is None: # still empty? easy peasy
+                # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
+                blog_comments = { str(post.key().id()) : { post_title : { str(c.key().id()) : c }}}
+            else:
+                # comments[idpost][post_title][idcomment] = obj_comment                         set
+                if str(post.key().id()) in blog_comments:
+                    blog_comments[str(post.key().id())][post_title][str(c.key().id())] = c
+                else:
+                    blog_comments[str(post.key().id())] = { post_title : { str(c.key().id()) : c }}
+
+            memcache.set("blog_comments", blog_comments)
+
+            #update post info in the db and later in the cache
+            post.comments += 1 #ammount of comments++
+            post.put()
+
+            blog_posts = memcache.get("blog_posts")
+            blog_posts[post.key().id()] = post
+            memcache.set("blog_posts", blog_posts)
+
+            calc_posts_statics("comments")
+            #TODO: make that ajax reload only the part of the comments
+
+            self.render_post(post = post, title = post_title)
+            # self.write("wao so much %s so much %s - %s" % (username, comment, post_title))
+
+        else:
+            error = "A empty comment ... Jhon travolta is confused. <br>"
+            error += '<iframe src="//giphy.com/embed/rCAVWjzASyNlm" width="480" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="http://giphy.com/gifs/confused-lego-travolta-rCAVWjzASyNlm">via GIPHY</a></p>'
+            self.render_post(post = post, title = post_title, commentError = error)
 
 
 class UserPageHandler(Handler):
@@ -580,7 +780,7 @@ class NewPost(Handler):
             blog_posts[str(post.key().id())] = post
             memcache.set("blog_posts", blog_posts)
 
-            cal_rec_post()
+            calc_posts_statics()
 
             self.redirect("/post%s" % title)
             return

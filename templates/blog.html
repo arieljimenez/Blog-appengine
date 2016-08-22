@@ -20,7 +20,7 @@
                 {% else %}
                     <li><a href="/">Home </a>|</li>
                 {% endif %}
-                <li><a href="/user/{{user.user_name}}">{{user.user_name}}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
+                <li><a href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
             {% else %}
                 <li><a href="/">Home </a>|</li>
                 <li><a href="/login">Login </a>|</li>
@@ -38,73 +38,112 @@
 
         {% block content %}
 
-            {% if title == "Home" %}
-                <div class="posts">
-                    <h1>Lastest Posts:</h1>
+        {% if title == "Home" %}
 
-                    {% if posts %}
-
-                        {% for p in posts %}
-                            <h4>{{ p.title.replace("_", " ")[1:] }}</h4>
-                            <hr>
-                            <p class="content-abr">{{p.content}}</p>
-                        {% endfor %}
-
-                    {% else %}
-                        <div id="no-post">
-                            <h3 class="center">No post alredy. Be the first in make one! Click <a href="/posts/new">here!</a></h3>
-                        </div>
-                    {% endif %}
+            {% if topten_comm_posts %}
+            <div id="ranking">
+                <div id="comm-posts">
+                    <h1>Posts most commented:</h1>
+                    <table class="ranking-posts">
+                        <tbody>
+                            <tr>
+                                <th class="title"> Title (Topic)</th>
+                                <th class="text-center"> Owner </th>
+                                <th class="text-center"> Comments  </th>
+                            </tr>
+                            {% for p in topten_comm_posts %}
+                            <tr>
+                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                                <td class="text-center">{{ p[2].comments }} </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+
+                {% if topten_view_posts %}
+                <div id="view-posts">
+                    <h1>Post most viewed:</h1>
+                    <table class="ranking-posts">
+                        <tbody>
+                            <tr>
+                                <th class="title"> Title (Topic)</th>
+                                <th class="text-center"> Owner </th>
+                                <th class="text-center"> Views </th>
+                            </tr>
+                            {% for p in topten_view_posts %}
+                            <tr>
+                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                                <td class="text-center"> {{ p[2].views }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% endif %}
+
+                </div> <!-- /ranking -->
 
             {% else %}
+                <div id="no-post">
+                    <h3 class="center">No post alredy. Be the first in make one! Click <a href="/posts/new">here!</a></h3>
+                </div>
+            {% endif %}
+
+        {% else %}
+        <hr>
+        <div class="post round">
+            <div class="post-header">
+                <div class="post-data">
+                    <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                    <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/?topics={{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
+                </div>
+                <div class="post-score">
+                    <p>{{ post.views }} Views | {{ post.comments }} Comments</p>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>{{ post.content }}</p>
+            </div>
             <hr>
+            <h3>Comments:</h3>
+            <div class="post-comments">
+                {% if user %}
+                    {% if comments %}
+                        {% for key, c in comments.items() %}
+                            <div class="user-comments">
+                                <h4><a href="/user/{{ c.user_name }}">{{ c.user_name }}</a>: ({{ c.created }}) </h4>
+                                    <textarea class="comment">{{ c.post_comment }}</textarea>
+                            </div>
+                        {% endfor %}
 
-            <div class="post round">
-                <div class="post-header">
-                    <div class="post-data">
-                        <h3>{{post.title.replace("_", " ")[1:]}}</h3>
-                        <small>Submited by {{ post.user }} in <a href="/search/?topics={{ post.topic }}">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
-                    </div>
-                    <div class="post-score">
-                        <p>{{ post.views }} Views | {{ post.comments}} Comments</p>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p>{{ post.content }}</p>
-                </div>
-                <hr>
-                <h3>Comments:</h3>
-                <div class="post-comments">
-                    {% if user %}
-                        {% if post.comments %}
-                            {% for c in comments %}
-                                <div class="user-comments">
-                                    <h4><a href="/user/{{ c.user }}">{{ c.user }}</a>: <span>({{ c.date }})</span></h4>
-                                    <textarea class="tarea-comments" disabled>{{ c.comment }}</textarea>
-                                </div>
-                            {% endfor %}
-
-                        {% endif %}
-
-                        <div class="user-comments">
-                            <h4>{{ user.user_name }}:</h4>
-                            <textarea class="tarea-comments" placeholder="Add a comment"></textarea>
-                        </div>
-
-                    {% else %}
-                        <div class="user-comments">
-                            <h2>You must <a href="/login">login</a> to leave a comment.</h2>
-                        </div>
                     {% endif %}
 
-                </div>
+                    <div class="user-comments">
+                        <form class="comment" method="post">
+                            <h4>{{ user.user_name }}:</h4>
+                            <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment"></textarea>
+                            <button class="round" type="submit">create</button>
+                            <p class="error">{{ commentError | safe }}</p>
+                        </form>
+                    </div>
+
+                {% else %}
+                    <div class="user-comments">
+                        <h2>You must <a href="/login">login</a> to leave a comment.</h2>
+                    </div>
+                {% endif %}
 
             </div>
 
-            {% endif %}
+        </div>
 
-        {% endblock %}
+        {% endif %}
+
+    {% endblock %}
 
         <hr>
         <div class="footer">

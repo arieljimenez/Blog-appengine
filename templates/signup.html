@@ -6,17 +6,17 @@
 <div class="login-page">
     <div class="form">
         <form class="register-form" method="post">
-          <input type="text" name="username" value="{{user}}" placeholder="name"/>
-          <small class="error">{{userError}}</small>
+          <input type="text" name="username" value="{{ user }}" placeholder="name"/>
+          <small class="error">{{ userError }}</small>
           <input type="password" name="password" value="" placeholder="password"/>
-          <small class="error">{{passError}}</small>
+          <small class="error">{{ passError }}</small>
           <input type="password" name="verify" value="" placeholder="verifypassword"/>
-          <small class="error">{{verifyError}}</small>
+          <small class="error">{{ verifyError }}</small>
           <input type="text" name="email" value="{{ email }}" placeholder="email address"/>
-          <small class="error">{{mailError}}</small>
+          <small class="error">{{ mailError }}</small>
           <button type="submit">create</button>
           <p class="message">Already registered? <a href="/login">Login</a></p>
-          <input type="hidden" name="next_url" value="{{next_url}}">
+          <input type="hidden" name="next_url" value="{{ next_url }}">
         </form>
     </div>
 </div>

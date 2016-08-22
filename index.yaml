@@ -26,6 +26,20 @@ indexes:
   properties:
   - name: modified
 
+- kind: Blog_Posts
+  ancestor: yes
+  properties:
+  - name: state
+  - name: views
+    direction: desc
+
+- kind: Blog_Posts
+  ancestor: yes
+  properties:
+  - name: state
+  - name: comments
+    direction: desc
+
 - kind: Pages
   ancestor: yes
   properties:
