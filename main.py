@@ -918,9 +918,6 @@ class AdminPanel(Handler):
             else:
                 topics[p.topic] += 1
 
-
-        logging.error(topics)
-
         self.render("admin_panel.html",
                     posts       = None,
                     user        = u,
@@ -930,22 +927,32 @@ class AdminPanel(Handler):
                     topten_comm_posts = topten_comm_posts,
                     topten_view_posts = topten_view_posts)
 
-
     def get(self):
         self.render_panel()
+
+
+class SearchTopic(Handler):
+    def get(self, topic):
+        pass
+
+class SearchPost(Handler):
+    def get(self, post):
+        pass
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
 
-app = webapp2.WSGIApplication([('/',            MainHandler),
-                               ('/login',       LoginHandler),
-                               ('/logout',      LogoutHandler),
-                               ('/signup',      SignUpHandler),
-                               ('/user'       + PAGE_RE, UserPageHandler),
-                               ('/adminpanel/?',  AdminPanel),
-                               ('/post/new/?',  NewPost),
-                               ('/post'       + PAGE_RE, MainHandler),
-                               ('/disable/'   + NUM_RE, DisableHandler),
-                               (PAGE_RE,        MainHandler),
+app = webapp2.WSGIApplication([('/',             MainHandler),
+                               ('/search/topic'+ PAGE_RE, SearchTopic),
+                               ('/search/post' + PAGE_RE, SearchPost),
+                               ('/login',        LoginHandler),
+                               ('/logout',       LogoutHandler),
+                               ('/signup',       SignUpHandler),
+                               ('/user'        + PAGE_RE, UserPageHandler),
+                               ('/adminpanel/?', AdminPanel),
+                               ('/post/new/?',   NewPost),
+                               ('/post'        + PAGE_RE, MainHandler),
+                               ('/disable/'    + NUM_RE, DisableHandler),
+                               (PAGE_RE,         MainHandler),
                                 ], debug=True)
