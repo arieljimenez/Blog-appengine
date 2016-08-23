@@ -33,6 +33,9 @@ h1 {
     font-family: 'Prompt';
 }
 
+h2 {
+    font-family: "Roboto";
+}
 
 h3 {
     margin: 0px;
@@ -292,13 +295,19 @@ input, textarea {
     background-color: #dddddd;
 }
 
-.text-center {
-    text-align: center;
+.text-center { text-align: center; }
+.disable { color: gray; }
+.underline { text-decoration: underline; }
+.indie-font { font-family: "Indie Flower"; }
+
+.out-rank {
+    background-color: gray;
+    color: white;
 }
 
-.disable {
-    color: gray;
-
+.out-rank td {
+    background-color: gray;
+    color: white;
 }
 /* ###################################### */
 /*

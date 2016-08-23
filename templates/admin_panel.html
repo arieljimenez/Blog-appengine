@@ -1,0 +1,121 @@
+{% extends 'blog.html' %}
+
+{% block content %}
+<br>
+<h1> Post Ranking </h1>
+<hr>
+<br>
+<div class="most-pp">
+    <h2 class="center">Most popular posts</h2>
+    <table class="ranking-posts">
+        <tbody>
+            <tr>
+                <th>Rank</th>
+                <th>Title</th>
+                <th>Owner</th>
+                <th>Date</th>
+                <th>Comments</th>
+                <th>Action</th>
+            </tr>
+
+    {% for p in topten_comm_posts %}
+        {% if loop.index > 5 %}
+            <tr class="out-rank">
+        {% else %}
+            <tr>
+        {% endif %}
+                <td class="center">{{ loop.index }}</td>
+                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                <td class="text-center"> {{ p[2].modified }}</td>
+                <td class="text-center"> {{ p[2].comments }}</td>
+                {% if p[2].state %}
+                <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                {% else %}
+                <td class="error"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                {% endif %}
+            </tr>
+    {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+<br>
+<div class="most-vp">
+    <h2 class="center">Hot posts</h2>
+    <table class="ranking-posts">
+        <tbody>
+            <tr>
+                <th>Rank</th>
+                <th>Title</th>
+                <th>Owner</th>
+                <th>Date</th>
+                <th>Views</th>
+            </tr>
+
+    {% for p in topten_view_posts %}
+
+        {% if loop.index > 5 %}
+            <tr class="out-rank">
+        {% else %}
+            <tr>
+        {% endif %}
+                <td class="center">{{ loop.index }}</td>
+                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                <td class="text-center"> {{ p[2].modified }}</td>
+                <td class="text-center"> {{ p[2].views }}</td>
+                {% if p[2].state %}
+                <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                {% else %}
+                <td class="error"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                {% endif %}
+            </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br>
+<div class="chart">
+    <h2 class="center">Chart of topics</h2>
+    <div id="chart_div" class="center"></div>
+
+
+</div>
+
+
+
+
+<!-- Google Charts -->
+<script type="text/javascript">
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([ {% for name, value in topics.items() %}
+                    ['{{ name }}', {{ value }}]{% if loop.index < topics|length %},{% endif %}
+                    {% endfor %}
+    ]);
+
+    // Set chart options
+    var options = {'title':'Topics',
+                   'width':800,
+                   'height':400};
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+    }
+</script>
+{% endblock %}

@@ -310,6 +310,27 @@ def calc_posts_statics(calc="all"):
 
         memcache.set("topten_view_posts", topten_view_posts)
 
+    if calc == "admin":
+        if calc == "comments" or calc == "all":
+            topten_comm_posts = []
+            comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY comments DESC LIMIT 10",  get_dbkey())
+
+            for post in comm_posts:
+                topten_comm_posts.append([post.title, post.comments, post])
+
+            memcache.set("topten_comm_posts", topten_comm_posts)
+
+
+        if calc == "views" or calc == "all":
+            topten_view_posts = []
+            view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY views DESC LIMIT 10",  get_dbkey())
+
+            for post in view_posts:
+                topten_view_posts.append([post.title, post.views, post])
+
+            memcache.set("topten_view_posts", topten_view_posts)
+
+
     # for key, value in blog_posts.items():
     #     logging.error("Error %s / %s " % (key, value))
 
@@ -866,19 +887,63 @@ class PostHandler(Handler):
 
 
 class AdminPanel(Handler):
+    def render_panel(self):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login")
+                return
+            elif not u.user_type == "admin":
+                self.redirect("/")
+                return
+        else:
+            self.redirect("/login")
+            return
+
+        calc_posts_statics("admin")
+        topten_comm_posts = memcache.get("topten_comm_posts")
+        topten_view_posts = memcache.get("topten_view_posts")
+
+        posts = memcache.get("blog_posts")
+
+        topics = {}
+
+        for key, p in posts.iteritems():
+
+            if not p.topic in topics:
+                topics[p.topic] = 1
+            else:
+                topics[p.topic] += 1
+
+
+        logging.error(topics)
+
+        self.render("admin_panel.html",
+                    posts       = None,
+                    user        = u,
+                    title       = "Admin Panel",
+                    topics      = topics,
+                    chart       = True,
+                    topten_comm_posts = topten_comm_posts,
+                    topten_view_posts = topten_view_posts)
+
+
     def get(self):
-        pass
+        self.render_panel()
+
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
-
 
 app = webapp2.WSGIApplication([('/',            MainHandler),
                                ('/login',       LoginHandler),
                                ('/logout',      LogoutHandler),
                                ('/signup',      SignUpHandler),
                                ('/user'       + PAGE_RE, UserPageHandler),
-                               ('/adminpanel',  AdminPanel),
+                               ('/adminpanel/?',  AdminPanel),
                                ('/post/new/?',  NewPost),
                                ('/post'       + PAGE_RE, MainHandler),
                                ('/disable/'   + NUM_RE, DisableHandler),

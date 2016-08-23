@@ -6,7 +6,7 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Prompt|Roboto|Indie+Flower|Slabo+27px" rel="stylesheet">
         <link rel="stylesheet" href="/css/blog.css">
 
-        {% if user_profile %}
+        {% if user_profile or chart %}
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         {% endif %}
     </head>
@@ -17,7 +17,7 @@
                 <li><a href="/post/new">New Post</a> | </li>
                 <li><a href="/">Home </a>|</li>
                 {% if user.user_type == "admin" %}
-                    <li><a href="/adminpanel/">Admin Panel</a> | </li>
+                    <li><a href="/adminpanel">Admin Panel</a> | </li>
                 {% endif %}
                 <li><a href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
             {% else %}
@@ -42,7 +42,7 @@
             {% if topten_comm_posts %}
             <div id="ranking">
                 <div id="comm-posts">
-                    <h1>Posts most commented:</h1>
+                    <h1 class="indie-font">Posts most commented:</h1>
                     <table class="ranking-posts">
                         <tbody>
                             <tr>
@@ -63,7 +63,7 @@
 
                 {% if topten_view_posts %}
                 <div id="view-posts">
-                    <h1>Post most viewed:</h1>
+                    <h1 class="indie-font">Hot posts:</h1>
                     <table class="ranking-posts">
                         <tbody>
                             <tr>

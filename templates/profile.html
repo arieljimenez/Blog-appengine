@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1 style="text-decoration: underline;">Wellcome back {{ user_profile.user_name }}!</h1>
+<h1 class="underline"> Wellcome back {{ user_profile.user_name }}!</h1>
 <div id="profile">
     <table class="profile">
         <tbody>
@@ -28,7 +28,7 @@
     <div id="chart_div"></div>
 </div>
 
-<!-- bad mode, later move to a blog.js and make a function to do this -->
+<!-- Google Charts -->
 <script type="text/javascript">
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
@@ -46,8 +46,11 @@
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
     data.addRows([
+
       ["{{ user_profile.user_name }}", {{ user_profile.comments + user_profile.posts }}],
+
       ['Others', {{ total_activity - (user_profile.comments + user_profile.posts) }}]
+
     ]);
 
     // Set chart options
