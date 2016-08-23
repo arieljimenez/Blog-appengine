@@ -190,13 +190,12 @@ def make_cache():
     time_spend = time.time()
     users = db.GqlQuery("SELECT * FROM Blog_Users WHERE ANCESTOR IS :1",  get_dbkey())
 
-    for user in users:
-         blog_users[str(user.key().id())] = user
+    if not any(u.user_type == "admin" for u in users):
+        logging.error("Ther is no admin, lets create one")
 
-    if len(blog_users) == 0:
         admin = Blog_Users( parent = get_dbkey(),
-                            user_name="ariel",
-                            user_pass= hash_str("ariel"),
+                            user_name="Admin",
+                            user_pass= hash_str("159357"),
                             user_type = "admin",
                             comments  = 0,
                             posts     = 0)
@@ -204,6 +203,11 @@ def make_cache():
         blog_users[str(admin.key().id())] = admin
 
         logging.error("admin created")
+
+
+
+    for user in users:
+         blog_users[str(user.key().id())] = user
 
     logging.error("took %s caching all the %s users " % (time.time() - time_spend, len(blog_users)))
 
@@ -287,7 +291,6 @@ def getCommentsbyTitle(title):
 
 def calc_posts_statics(calc="all"):
 
-
     if calc == "comments" or calc == "all":
         topten_comm_posts = []
         comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY comments DESC LIMIT 10",  get_dbkey())
@@ -345,6 +348,26 @@ def calc_posts_statics(calc="all"):
 
     #         memcache.set("topten_view_posts", topten_view_posts)
 
+
+def setDisablePost(title_id):
+    posts = memcache.get("blog_posts")
+    post = posts[title_id]
+
+    # if post.state :
+    #     post.estate = False
+
+    # else:
+    #     post.estate = True
+
+    post.state = not post.state
+
+    post.put()
+
+    calc_posts_statics("comments")
+
+    memcache.set("blog_posts", posts)
+
+    return post
 
 ############################################################################################################
 ###################################################### HANDLERS ############################################
@@ -554,6 +577,11 @@ class MainHandler(Handler):
                 return
 
         if not title == "Home" :
+
+            if not post.state and not u.user_type == "admin":
+                self.error(404)
+                return
+
             comments = getCommentsbyTitle(title)
 
             if comments:
@@ -651,6 +679,14 @@ class MainHandler(Handler):
             post.comments += 1 #ammount of comments++
             post.put()
 
+            #update user statics
+            u.comments += 1
+            u.put()
+
+            users = memcache.get("blog_users")
+            users[str(u.key().id())] = u
+            memcache.set("blog_users", users)
+
             blog_posts = memcache.get("blog_posts")
             blog_posts[post.key().id()] = post
             memcache.set("blog_posts", blog_posts)
@@ -685,14 +721,14 @@ class UserPageHandler(Handler):
         if user_data:
             title = "%s is profile " % user_data.user_name
 
-            #totalposts = len(memcache.get("blog_posts"))
-            totalposts = 50;
+            total_activity = len(memcache.get("blog_posts")) + len(memcache.get("blog_comments"))
+            #totalposts = 50;
 
             self.render("profile.html",
                         title=title,
                         user = u,
                         user_profile = user_data,
-                        totalposts=totalposts)
+                        total_activity = total_activity)
         else:
             self.error(500)
             # error = "User does not exist or is currently invalid."
@@ -774,8 +810,16 @@ class NewPost(Handler):
                                user     = u.user_name,
                                state    = True,
                                comments = 0,
-                               views    = 0)
+                               views    = -1) # so, wen the user see it, the counter ll'be 0
             post.put()
+
+            # update user statics
+            u.posts += 1
+            u.put()
+
+            users = memcache.get("blog_users")
+            users[str(u.key().id())] = u
+            memcache.set("blog_users", users)
 
             blog_posts[str(post.key().id())] = post
             memcache.set("blog_posts", blog_posts)
@@ -793,7 +837,27 @@ class NewPost(Handler):
                                 contentError= contentError)
 
 
+class DisableHandler(Handler):
+    def get(self, title_id=None):
+        user_cookie_str = self.request.cookies.get('user_id')
 
+        if user_cookie_str and not title_id is None: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login")
+                return
+
+            elif not u.user_type == "admin":
+                self.redirect("/")
+                return
+
+            post = setDisablePost(title_id)
+
+            self.redirect(post.title)
+            return
+
+        self.redirect("/")
 
 
 class PostHandler(Handler):
@@ -806,14 +870,17 @@ class AdminPanel(Handler):
         pass
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
+NUM_RE = r'((?:[0-9]+/?)*)'
+
 
 app = webapp2.WSGIApplication([('/',            MainHandler),
                                ('/login',       LoginHandler),
                                ('/logout',      LogoutHandler),
                                ('/signup',      SignUpHandler),
-                               ('/user'+     PAGE_RE, UserPageHandler),
+                               ('/user'       + PAGE_RE, UserPageHandler),
                                ('/adminpanel',  AdminPanel),
-                               ('/post/new/?', NewPost),
-                               ('/post'+ PAGE_RE, MainHandler),
-                               (PAGE_RE, MainHandler),
+                               ('/post/new/?',  NewPost),
+                               ('/post'       + PAGE_RE, MainHandler),
+                               ('/disable/'   + NUM_RE, DisableHandler),
+                               (PAGE_RE,        MainHandler),
                                 ], debug=True)

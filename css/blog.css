@@ -296,6 +296,10 @@ input, textarea {
     text-align: center;
 }
 
+.disable {
+    color: gray;
+
+}
 /* ###################################### */
 /*
  las esquinas 1 y 3 seran las

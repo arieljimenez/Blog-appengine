@@ -2,25 +2,25 @@
 
 {% block content %}
 
-<h1 style="text-decoration: underline;">Wellcome back {{user_profile.user_name}}!</h1>
+<h1 style="text-decoration: underline;">Wellcome back {{ user_profile.user_name }}!</h1>
 <div id="profile">
     <table class="profile">
         <tbody>
             <tr>
                 <td class="profile-data"> Username </td>
-                <td><input type="text" name="username" value="{{user_profile.user_name}}" disabled=""></td>
+                <td><input type="text" name="username" value="{{ user_profile.user_name }}" disabled=""></td>
             </tr>
             <tr>
                 <td> Mail </td>
-                <td><input type="text" name="username" value="{{user_profile.user_mail}}" disabled=""></td>
+                <td><input type="text" name="username" value="{{ user_profile.user_mail }}" disabled=""></td>
             </tr>
             <tr>
                 <td> Comments </td>
-                <td><span class="round">{{user_profile.comments}}</span></td>
+                <td><span class="round">{{ user_profile.comments }}</span></td>
             </tr>
             <tr>
                 <td>Posts</td>
-                <td><span class="round">{{user_profile.posts}}</span></td>
+                <td><span class="round">{{ user_profile.posts }}</span></td>
             </tr>
         </tbody>
     </table>
@@ -46,8 +46,8 @@
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
     data.addRows([
-      ["{{user_profile.user_name}}", {{user_profile.comments + user_profile.posts }}],
-      ['Others', {{ totalposts - (user_profile.comments + user_profile.posts )}}]
+      ["{{ user_profile.user_name }}", {{ user_profile.comments + user_profile.posts }}],
+      ['Others', {{ total_activity - (user_profile.comments + user_profile.posts) }}]
     ]);
 
     // Set chart options

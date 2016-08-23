@@ -30,14 +30,14 @@ indexes:
   ancestor: yes
   properties:
   - name: state
-  - name: views
+  - name: comments
     direction: desc
 
 - kind: Blog_Posts
   ancestor: yes
   properties:
   - name: state
-  - name: comments
+  - name: views
     direction: desc
 
 - kind: Pages

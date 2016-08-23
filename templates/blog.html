@@ -15,10 +15,9 @@
         <ul class="nav">
             {% if user.user_name %}
                 <li><a href="/post/new">New Post</a> | </li>
+                <li><a href="/">Home </a>|</li>
                 {% if user.user_type == "admin" %}
                     <li><a href="/adminpanel/">Admin Panel</a> | </li>
-                {% else %}
-                    <li><a href="/">Home </a>|</li>
                 {% endif %}
                 <li><a href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
             {% else %}
@@ -98,7 +97,17 @@
         <div class="post round">
             <div class="post-header">
                 <div class="post-data">
-                    <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                    {% if user.user_type == "admin" %}
+                        {% if post.state %}
+                            <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
+                        {% else %}
+                            <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
+                        {% endif %}
+                    {% else %}
+                        <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                    {% endif %}
+
+
                     <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/?topics={{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
                 </div>
                 <div class="post-score">
