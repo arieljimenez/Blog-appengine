@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>{{ title }}</title>
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Prompt|Roboto|Indie+Flower|Slabo+27px" rel="stylesheet">
         <link rel="stylesheet" href="/css/blog.css">
@@ -34,6 +34,12 @@
             <img src="/img/miku-headband.jpg" alt="headband">
         </div>
         <!-- /headband -->
+
+        <div id="search-box">
+            <form id="search-form" action="javascript: alert('Success!');" class='search-form'>
+                <span id="search-text">Search</span> <input type="text" name="query" placeholder="something?">
+            </form>
+        </div>
 
         {% block content %}
 
@@ -159,5 +165,8 @@
             <p>[ Made with love in Python + AJAX + HTML & CCS ]</p>
         </div>
 
+        <!-- SCRIPTS -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/site.js"></script>
     </body>
 </html>

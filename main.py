@@ -931,21 +931,49 @@ class AdminPanel(Handler):
         self.render_panel()
 
 
-class SearchTopic(Handler):
-    def get(self, topic):
-        pass
+class SearchHandler(Handler):
+    def search_query(self, query):
+        self.write(query)
 
-class SearchPost(Handler):
-    def get(self, post):
-        pass
+
+    def get(self, query="/"):
+        search_topic(query)
+
+
+    def post(self):
+        query = cgi.escape(self.request.get('query'), quote= True)
+
+        if query :
+            matched_posts = {}
+            posts = memcache.get("blog_posts")
+
+            for key, p in posts.iteritems():
+                if p.state and query in p.title or query in p.topic:
+                    matched_posts[key] = {  "title": p.title,
+                                            "topic": p.topic,
+                                            "content": p.content,
+                                            "user"  : p.user,
+                                            "comments": p.comments,
+                                            "views": p.views,
+                                            "modified": p.modified.strftime("%b %d, %Y") }
+
+            data = json.dumps(matched_posts)
+
+            return
+
+
+
+        else:
+            self.redirect("/")
+
+
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
 
 app = webapp2.WSGIApplication([('/',             MainHandler),
-                               ('/search/topic'+ PAGE_RE, SearchTopic),
-                               ('/search/post' + PAGE_RE, SearchPost),
+                               ('/search',       SearchHandler),
                                ('/login',        LoginHandler),
                                ('/logout',       LogoutHandler),
                                ('/signup',       SignUpHandler),

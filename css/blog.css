@@ -90,6 +90,18 @@ input, textarea {
     padding-top: 20px;
 }
 
+#search {
+    display: flex;
+    width: 30%;
+    resize: none;
+}
+
+
+#search-text {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
 .profile{
     height: 300px;
     font-family: sans-serif;
@@ -308,6 +320,10 @@ input, textarea {
 .out-rank td {
     background-color: gray;
     color: white;
+}
+
+.search-form {
+    display: flex;
 }
 /* ###################################### */
 /*
