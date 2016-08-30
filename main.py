@@ -25,6 +25,7 @@ import urllib
 import json
 import logging
 import time
+import httplib
 
 from collections import OrderedDict
 
@@ -937,18 +938,22 @@ class SearchHandler(Handler):
 
 
     def get(self, query="/"):
-        search_topic(query)
+        self.search_query(query)
 
 
-    def post(self):
-        query = cgi.escape(self.request.get('query'), quote= True)
+    def post(self, query):
+        query = cgi.escape( query, quote= True )
+
+        logging.error("geting posted %s:" % query)
 
         if query :
             matched_posts = {}
             posts = memcache.get("blog_posts")
 
+            query = query[1:].lower()
+
             for key, p in posts.iteritems():
-                if p.state and query in p.title or query in p.topic:
+                if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower():
                     matched_posts[key] = {  "title": p.title,
                                             "topic": p.topic,
                                             "content": p.content,
@@ -957,11 +962,8 @@ class SearchHandler(Handler):
                                             "views": p.views,
                                             "modified": p.modified.strftime("%b %d, %Y") }
 
-            data = json.dumps(matched_posts)
-
-            return
-
-
+            response = json.dumps(matched_posts)
+            self.write( response )
 
         else:
             self.redirect("/")
@@ -973,10 +975,10 @@ PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
 
 app = webapp2.WSGIApplication([('/',             MainHandler),
-                               ('/search',       SearchHandler),
-                               ('/login',        LoginHandler),
-                               ('/logout',       LogoutHandler),
-                               ('/signup',       SignUpHandler),
+                               ('/search'      + PAGE_RE, SearchHandler),
+                               ('/login/?',      LoginHandler),
+                               ('/logout/?',     LogoutHandler),
+                               ('/signup/?',     SignUpHandler),
                                ('/user'        + PAGE_RE, UserPageHandler),
                                ('/adminpanel/?', AdminPanel),
                                ('/post/new/?',   NewPost),

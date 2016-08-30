@@ -91,9 +91,7 @@ input, textarea {
 }
 
 #search {
-    display: flex;
-    width: 30%;
-    resize: none;
+    width: 100%;
 }
 
 
@@ -101,6 +99,12 @@ input, textarea {
     padding-top: 15px;
     padding-bottom: 15px;
 }
+
+#search_items {
+    list-style: none;
+}
+
+/*##### CLASS ##### */
 
 .profile{
     height: 300px;
@@ -325,6 +329,12 @@ input, textarea {
 .search-form {
     display: flex;
 }
+
+.search_item + .search_item {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 /* ###################################### */
 /*
  las esquinas 1 y 3 seran las

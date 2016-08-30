@@ -36,12 +36,16 @@
         <!-- /headband -->
 
         <div id="search-box">
-            <form id="search-form" action="javascript: alert('Success!');" class='search-form'>
-                <span id="search-text">Search</span> <input type="text" name="query" placeholder="something?">
+            <form id="search-form" class='search-form'>
+                <span id="search-text">Search</span> <input id="search_input" type="text" name="query" placeholder="something?">
             </form>
         </div>
 
         {% block content %}
+
+        <div id="search">
+            <ul id="search_items"></ul>
+        </div>
 
         {% if title == "Home" %}
 
@@ -159,14 +163,13 @@
         {% endif %}
 
     {% endblock %}
-
         <hr>
         <div class="footer">
             <p>[ Made with love in Python + AJAX + HTML & CCS ]</p>
         </div>
 
         <!-- SCRIPTS -->
-        <script src="/js/jquery.min.js"></script>
+        <script src="/js/jquery-3.1.0.min.js"></script>
         <script src="/js/site.js"></script>
     </body>
 </html>
