@@ -1,16 +1,16 @@
 
 function loadData() {
     if( $("input:first").val().length > 0) {
-        ranking =  $("#ranking").clone();
 
-        var query = $("input:first").val();
-        var $main = $("#main");
+        main = $("#main").clone();
+
+        var query = $("input:first").val().replace(/ /g, "_");
         var $search_items = $("#search_items");
 
         $search_items.children().remove();
 
         var RequeestTimeout = setTimeout(function() {
-            $("input").text("Failed to get resources.");
+            $("input:first").text("Failed to get resources.");
         }, 5000);
 
         $.ajax({
@@ -20,7 +20,9 @@ function loadData() {
 
         }).done(function(data) {
             if ( data ){
-                $("#ranking").children().remove();
+
+                console.log(data);
+                $("#main").children().remove();
 
                 $.each( data, function( key, val ) {
                     $search_items.append("<li class='search_item'>\
@@ -45,11 +47,11 @@ function loadData() {
 
 };
 
-var ranking =  null;
+var main = null;
 
 $("#search_input").keydown( function() {
-    if ($("#search_input").val() == "" && $("#ranking").children().length == 0 ){
-        ranking.clone().appendTo($("#ranking"));
+    if ($("#search_input").val() == "" && $("#main").children().length == 0 ){
+        main.clone().appendTo( $("#main") );
         $("#search_items").children().remove();
     }
 
@@ -57,3 +59,9 @@ $("#search_input").keydown( function() {
 
 
 $('#search-form').submit( loadData );
+
+$( document ).ready( function () {
+    if( $("input:first").val() != ""){
+        loadData();
+    };
+})

@@ -626,7 +626,8 @@ class MainHandler(Handler):
                     comments = comments,
                     commentError = commentError,
                     topten_comm_posts = topten_comm_posts,
-                    topten_view_posts = topten_view_posts)
+                    topten_view_posts = topten_view_posts,
+                    query = "")
 
 
     def get(self, title="/"):
@@ -933,19 +934,7 @@ class AdminPanel(Handler):
 
 
 class SearchHandler(Handler):
-    def search_query(self, query):
-        self.write(query)
-
-
-    def get(self, query="/"):
-        self.search_query(query)
-
-
-    def post(self, query):
-        query = cgi.escape( query, quote= True )
-
-        logging.error("geting posted %s:" % query)
-
+    def search_posts(self, query):
         if query :
             matched_posts = {}
             posts = memcache.get("blog_posts")
@@ -954,20 +943,63 @@ class SearchHandler(Handler):
 
             for key, p in posts.iteritems():
                 if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower():
-                    matched_posts[key] = {  "title": p.title,
-                                            "topic": p.topic,
-                                            "content": p.content,
-                                            "user"  : p.user,
-                                            "comments": p.comments,
-                                            "views": p.views,
-                                            "modified": p.modified.strftime("%b %d, %Y") }
+                    matched_posts[key] = {  "title"     : p.title,
+                                            "topic"     : p.topic,
+                                            "content"   : p.content,
+                                            "user"      : p.user,
+                                            "comments"  : p.comments,
+                                            "views"     : p.views,
+                                            "modified"  : p.modified.strftime("%b %d, %Y") }
+            return matched_posts
 
-            response = json.dumps(matched_posts)
-            self.write( response )
 
+    def render_search(self, matched_posts, query):
+
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login")
+                return
         else:
-            self.redirect("/")
+            self.redirect("/login")
+            return
 
+
+        self.render("search.html",
+                    posts       = None,
+                    user        = u,
+                    title       = "Search: %s" % query[1:],
+                    query       = query[1:],
+                    matched_posts = matched_posts)
+
+
+    def get(self, query="/"):
+
+        if query == "/":
+            self.redirect("/")
+            return
+
+        matched_posts = self.search_posts(query)
+
+        self.render_search(matched_posts=matched_posts, query=query)
+
+
+    def post(self, query):
+        query = cgi.escape( query, quote= True )
+
+        matched_posts = self.search_posts(query)
+
+        response = "null"
+
+        if matched_posts :
+            response = json.dumps(matched_posts)
+
+        logging.error( response )
+
+        self.write( response )
 
 
 

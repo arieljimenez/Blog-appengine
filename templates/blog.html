@@ -37,15 +37,16 @@
 
         <div id="search-box">
             <form id="search-form" class='search-form'>
-                <span id="search-text">Search</span> <input id="search_input" type="text" name="query" placeholder="something?">
+                <span id="search-text">Search</span> <input value="{{ query.replace('_', ' ') }}" id="search_input" type="text" name="query" placeholder="something?">
             </form>
         </div>
-
-        {% block content %}
 
         <div id="search">
             <ul id="search_items"></ul>
         </div>
+
+        <div id="main">
+        {% block content %}
 
         {% if title == "Home" %}
 
@@ -62,7 +63,7 @@
                             </tr>
                             {% for p in topten_comm_posts %}
                             <tr>
-                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
                                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                                 <td class="text-center">{{ p[2].comments }} </td>
                             </tr>
@@ -83,7 +84,7 @@
                             </tr>
                             {% for p in topten_view_posts %}
                             <tr>
-                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
                                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                                 <td class="text-center"> {{ p[2].views }}</td>
                             </tr>
@@ -118,7 +119,7 @@
                     {% endif %}
 
 
-                    <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/?topics={{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
+                    <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
                 </div>
                 <div class="post-score">
                     <p>{{ post.views }} Views | {{ post.comments }} Comments</p>
@@ -163,6 +164,7 @@
         {% endif %}
 
     {% endblock %}
+    </div>
         <hr>
         <div class="footer">
             <p>[ Made with love in Python + AJAX + HTML & CCS ]</p>
