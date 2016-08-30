@@ -7,7 +7,6 @@ function loadData() {
         var $main = $("#main");
         var $search_items = $("#search_items");
 
-        $("#ranking").children().remove();
         $search_items.children().remove();
 
         var RequeestTimeout = setTimeout(function() {
@@ -21,11 +20,13 @@ function loadData() {
 
         }).done(function(data) {
             if ( data ){
+                $("#ranking").children().remove();
+
                 $.each( data, function( key, val ) {
                     $search_items.append("<li class='search_item'>\
                                             <a href=/post"+ val.title +"><h3>"+ val.title.slice(1).replace(/_/g, " ") +"</h3></a>\
-                                            <span>"+ val.content +"</span>\
-                                            <small>(by "+ val.user +")</small>\
+                                            <p>"+ val.content +"</p>\
+                                            <small class='user_name'>(by "+ val.user +" on "+ val.modified +")</small>\
                                          </li>" );
                 });
 
