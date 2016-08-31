@@ -312,24 +312,30 @@ def calc_posts_statics(calc="all"):
         memcache.set("topten_view_posts", topten_view_posts)
 
     if calc == "admin":
-        if calc == "comments" or calc == "all":
-            topten_comm_posts = []
-            comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY comments DESC LIMIT 10",  get_dbkey())
+        topten_comm_posts = []
+        comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY comments DESC LIMIT 10",  get_dbkey())
 
-            for post in comm_posts:
-                topten_comm_posts.append([post.title, post.comments, post])
+        for post in comm_posts:
+            topten_comm_posts.append([post.title, post.comments, post])
 
-            memcache.set("topten_comm_posts", topten_comm_posts)
+        memcache.set("topten_comm_posts", topten_comm_posts)
 
 
-        if calc == "views" or calc == "all":
-            topten_view_posts = []
-            view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY views DESC LIMIT 10",  get_dbkey())
+        topten_view_posts = []
+        view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY views DESC LIMIT 10",  get_dbkey())
 
-            for post in view_posts:
-                topten_view_posts.append([post.title, post.views, post])
+        for post in view_posts:
+            topten_view_posts.append([post.title, post.views, post])
 
-            memcache.set("topten_view_posts", topten_view_posts)
+        memcache.set("topten_view_posts", topten_view_posts)
+
+        disabled_posts = []
+        disabled = db.GqlQuery("SELECT * FROM Blog_Posts WHERE state = False AND ANCESTOR IS :1 ORDER BY comments DESC",  get_dbkey())
+
+        for post in disabled:
+            disabled_posts.append([post.title, post.views, post])
+
+        memcache.set("disabled_posts", disabled_posts)
 
 
     # for key, value in blog_posts.items():
@@ -908,10 +914,12 @@ class AdminPanel(Handler):
         calc_posts_statics("admin")
         topten_comm_posts = memcache.get("topten_comm_posts")
         topten_view_posts = memcache.get("topten_view_posts")
+        disabled_posts    = memcache.get("disabled_posts")
 
         posts = memcache.get("blog_posts")
 
         topics = {}
+        disabled = {}
 
         for key, p in posts.iteritems():
 
@@ -920,6 +928,7 @@ class AdminPanel(Handler):
             else:
                 topics[p.topic] += 1
 
+
         self.render("admin_panel.html",
                     posts       = None,
                     user        = u,
@@ -927,7 +936,8 @@ class AdminPanel(Handler):
                     topics      = topics,
                     chart       = True,
                     topten_comm_posts = topten_comm_posts,
-                    topten_view_posts = topten_view_posts)
+                    topten_view_posts = topten_view_posts,
+                    disabled_posts = disabled_posts)
 
     def get(self):
         self.render_panel()

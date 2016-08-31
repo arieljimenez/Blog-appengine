@@ -1,6 +1,10 @@
 {% extends 'blog.html' %}
 
 {% block content %}
+<div class="chart">
+    <h2 class="center">Chart of topics</h2>
+    <div id="chart_div" class="center"></div>
+</div>
 <br>
 <h1> Post Ranking </h1>
 <hr>
@@ -9,7 +13,7 @@
     <h2 class="center">Most popular posts</h2>
     <table class="ranking-posts">
         <tbody>
-            <tr>
+            <tr class="text-center">
                 <th>Rank</th>
                 <th>Title</th>
                 <th>Owner</th>
@@ -29,11 +33,7 @@
                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                 <td class="text-center"> {{ p[2].modified }}</td>
                 <td class="text-center"> {{ p[2].comments }}</td>
-                {% if p[2].state %}
                 <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
-                {% else %}
-                <td class="error"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
-                {% endif %}
             </tr>
     {% endfor %}
 
@@ -45,7 +45,7 @@
     <h2 class="center">Hot posts</h2>
     <table class="ranking-posts">
         <tbody>
-            <tr>
+            <tr class="text-center">
                 <th>Rank</th>
                 <th>Title</th>
                 <th>Owner</th>
@@ -65,27 +65,35 @@
                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                 <td class="text-center"> {{ p[2].modified }}</td>
                 <td class="text-center"> {{ p[2].views }}</td>
-                {% if p[2].state %}
                 <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
-                {% else %}
-                <td class="error"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
-                {% endif %}
             </tr>
     {% endfor %}
         </tbody>
     </table>
 </div>
 <br>
-<div class="chart">
-    <h2 class="center">Chart of topics</h2>
-    <div id="chart_div" class="center"></div>
-
-
+<div class='disabled-post'>
+    <h2 class='center'>Disabled Posts</h2>
+    <table class='ranking-posts'>
+        <tbody>
+            <tr class='text-center'>
+                <th>Title</th>
+                <th>Owner</th>
+                <th>Date</th>
+                <th>Views</th>
+            </tr>
+        {% for p in disabled_posts %}
+            <tr>
+                <td> <a href='/post{{ p[0] }}'>{{ p[0].replace('_', ' ')[1:] }}</a></td>
+                <td class='text-center'> <a href='/user/{{ p[2].user }}'>{{ p[2].user }} </a></td>
+                <td class='text-center'> {{ p[2].modified }}</td>
+                <td class='text-center'> {{ p[2].views }}</td>
+                <td class='error'> <a href='/disable/{{ p[2].key().id() }}'> Enable </a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
-
-
-
-
 <!-- Google Charts -->
 <script type="text/javascript">
     // Load the Visualization API and the corechart package.

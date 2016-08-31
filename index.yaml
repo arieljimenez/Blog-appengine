@@ -24,6 +24,12 @@ indexes:
 - kind: Blog_Posts
   ancestor: yes
   properties:
+  - name: comments
+    direction: desc
+
+- kind: Blog_Posts
+  ancestor: yes
+  properties:
   - name: modified
 
 - kind: Blog_Posts
@@ -37,6 +43,12 @@ indexes:
   ancestor: yes
   properties:
   - name: state
+  - name: views
+    direction: desc
+
+- kind: Blog_Posts
+  ancestor: yes
+  properties:
   - name: views
     direction: desc
 

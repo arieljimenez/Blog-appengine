@@ -37,7 +37,11 @@
 
         <div id="search-box">
             <form id="search-form" class='search-form'>
+            {% if query %}
                 <span id="search-text">Search</span> <input value="{{ query.replace('_', ' ') }}" id="search_input" type="text" name="query" placeholder="something?">
+            {% else %}
+                <span id="search-text">Search</span> <input value="" id="search_input" type="text" name="query" placeholder="something?">
+            {% endif %}
             </form>
         </div>
 

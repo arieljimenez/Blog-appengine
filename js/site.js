@@ -21,7 +21,6 @@ function loadData() {
         }).done(function(data) {
             if ( data ){
 
-                console.log(data);
                 $("#main").children().remove();
 
                 $.each( data, function( key, val ) {
