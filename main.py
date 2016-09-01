@@ -620,12 +620,15 @@ class MainHandler(Handler):
             topten_comm_posts = None
             topten_view_posts = None
 
+            page = "post.html"
+
         else:
+            page = "blog.html"
             calc_posts_statics("views")
             topten_comm_posts = memcache.get("topten_comm_posts")
             topten_view_posts = memcache.get("topten_view_posts")
 
-        self.render("blog.html",
+        self.render(page,
                     post  = post,
                     title = title,
                     user  = u,
@@ -1007,10 +1010,26 @@ class SearchHandler(Handler):
         if matched_posts :
             response = json.dumps(matched_posts)
 
-        logging.error( response )
-
         self.write( response )
 
+class CommentsHandler(Handler):
+    def get(self):
+        self.redirect("/")
+
+    def post(self, page):
+        comments = getCommentsbyTitle( page )
+        comments_json = "null"
+
+        if comments:
+            comments_json = {}
+
+            for key, c in comments.iteritems():
+                comments_json[key] = {  "user"   : c.user_name,
+                                        "comment": c.post_comment,
+                                        "created": c.created.strftime("%b %d, %Y") }
+            comments_json = json.dumps( comments_json )
+
+        self.write( comments_json )
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
@@ -1026,5 +1045,6 @@ app = webapp2.WSGIApplication([('/',             MainHandler),
                                ('/post/new/?',   NewPost),
                                ('/post'        + PAGE_RE, MainHandler),
                                ('/disable/'    + NUM_RE, DisableHandler),
+                               ('/getcomments' + PAGE_RE, CommentsHandler),
                                (PAGE_RE,         MainHandler),
                                 ], debug=True)

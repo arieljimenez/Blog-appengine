@@ -1,0 +1,109 @@
+{% extends "blog.html" %}
+
+{% block content %}
+<hr>
+    <div class="post round">
+        <div class="post-header">
+            <div class="post-data">
+                {% if user.user_type == "admin" %}
+                    {% if post.state %}
+                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
+                    {% else %}
+                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
+                    {% endif %}
+                {% else %}
+                    <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                {% endif %}
+                <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
+            </div>
+            <div class="post-score">
+                <p>{{ post.views }} Views | {{ post.comments }} Comments</p>
+            </div>
+        </div>
+        <div class="post-content">
+            <p>{{ post.content }}</p>
+        </div>
+        <hr>
+        <!-- COMMENTS -->
+        <h3>Comments:</h3>
+        <div class="post-comments">
+            <h4>L o a d i n g   c o m m e n t s . . . </h4>
+        </div>
+
+        {% if user %}
+        <div class="user-comments">
+            <form class="comment" method="post">
+                <h4>{{ user.user_name }}:</h4>
+                <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment"></textarea>
+                <button class="round" type="submit">create</button>
+                <p class="error">{{ commentError | safe }}</p>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="user-comments">
+            <h2>You must <a href="/login">login</a> to leave a comment.</h2>
+        </div>
+        {% endif %}
+
+    </div>
+
+<!-- SCRIPTS FOR THIS TEMPLATE -->
+<script src="/js/comments.js"></script>
+
+{#
+    <div class="post round">
+        <div class="post-header">
+            <div class="post-data">
+                {% if user.user_type == "admin" %}
+                    {% if post.state %}
+                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
+                    {% else %}
+                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
+                    {% endif %}
+                {% else %}
+                    <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                {% endif %}
+                <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
+            </div>
+            <div class="post-score">
+                <p>{{ post.views }} Views | {{ post.comments }} Comments</p>
+            </div>
+        </div>
+        <div class="post-content">
+            <p>{{ post.content }}</p>
+        </div>
+        <hr>
+        <!-- COMMENTS -->
+        <h3>Comments:</h3>
+        <div class="post-comments">
+            {% if user %}
+                {% if comments %}
+                    {% for key, c in comments.items() %}
+                        <div class="user-comments">
+                            <h4><a href="/user/{{ c.user_name }}">{{ c.user_name }}</a>: ({{ c.created }}) </h4>
+                                <textarea class="comment">{{ c.post_comment }}</textarea>
+                        </div>
+                    {% endfor %}
+
+                {% endif %}
+
+                <div class="user-comments">
+                    <form class="comment" method="post">
+                        <h4>{{ user.user_name }}:</h4>
+                        <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment"></textarea>
+                        <button class="round" type="submit">create</button>
+                        <p class="error">{{ commentError | safe }}</p>
+                    </form>
+                </div>
+
+            {% else %}
+                <div class="user-comments">
+                    <h2>You must <a href="/login">login</a> to leave a comment.</h2>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+#}
+{% endblock %}
