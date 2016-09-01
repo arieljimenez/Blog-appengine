@@ -53,7 +53,6 @@ $("#search_input").keydown( function() {
         main.clone().appendTo( $("#main") );
         $("#search_items").children().remove();
     }
-
 });
 
 

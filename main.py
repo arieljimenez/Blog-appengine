@@ -665,74 +665,7 @@ class MainHandler(Handler):
             # self.render("error.html", error=error, user=None)
 
 
-    def post(self, post_title):
-        user_cookie_str = self.request.cookies.get('user_id')
 
-        if user_cookie_str: # if cookie exist
-            u = valid_cookie(user_cookie_str)
-
-            if not u:
-                self.redirect("/login") # bad cookie
-                return
-
-        comment = cgi.escape(self.request.get('comment'), quote= True)
-
-        post = getPostbytitle(post_title)
-
-        if comment:
-            c = Comments( parent      = get_dbkey(),
-                          user_id     = u.key().id(),
-                          user_name   = u.user_name,
-                          post_id     = post.key().id(),
-                          post_title  = post_title,
-                          post_comment= comment,
-                          state       = True)
-            c.put()
-
-            blog_comments = memcache.get("blog_comments")
-
-            if blog_comments is None:
-                make_cache()
-                blog_comments = memcache.get("blog_comments")
-
-            if blog_comments is None: # still empty? easy peasy
-                # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
-                blog_comments = { str(post.key().id()) : { post_title : { str(c.key().id()) : c }}}
-            else:
-                # comments[idpost][post_title][idcomment] = obj_comment                         set
-                if str(post.key().id()) in blog_comments:
-                    blog_comments[str(post.key().id())][post_title][str(c.key().id())] = c
-                else:
-                    blog_comments[str(post.key().id())] = { post_title : { str(c.key().id()) : c }}
-
-            memcache.set("blog_comments", blog_comments)
-
-            #update post info in the db and later in the cache
-            post.comments += 1 #ammount of comments++
-            post.put()
-
-            #update user statics
-            u.comments += 1
-            u.put()
-
-            users = memcache.get("blog_users")
-            users[str(u.key().id())] = u
-            memcache.set("blog_users", users)
-
-            blog_posts = memcache.get("blog_posts")
-            blog_posts[post.key().id()] = post
-            memcache.set("blog_posts", blog_posts)
-
-            calc_posts_statics("comments")
-            #TODO: make that ajax reload only the part of the comments
-
-            self.render_post(post = post, title = post_title)
-            # self.write("wao so much %s so much %s - %s" % (username, comment, post_title))
-
-        else:
-            error = "A empty comment ... Jhon travolta is confused. <br>"
-            error += '<iframe src="//giphy.com/embed/rCAVWjzASyNlm" width="480" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="http://giphy.com/gifs/confused-lego-travolta-rCAVWjzASyNlm">via GIPHY</a></p>'
-            self.render_post(post = post, title = post_title, commentError = error)
 
 
 class UserPageHandler(Handler):
@@ -1012,30 +945,136 @@ class SearchHandler(Handler):
 
         self.write( response )
 
+
 class CommentsHandler(Handler):
     def get(self):
-        self.redirect("/")
 
-    def post(self, page):
-        comments = getCommentsbyTitle( page )
-        comments_json = "null"
+        if self.request.get('page'):
 
-        if comments:
-            comments_json = {}
+            page = "/" + self.request.get('page')
 
-            for key, c in comments.iteritems():
-                comments_json[key] = {  "user"   : c.user_name,
-                                        "comment": c.post_comment,
-                                        "created": c.created.strftime("%b %d, %Y") }
-            comments_json = json.dumps( comments_json )
+            comments = getCommentsbyTitle( page )
+            comments_json = "null"
 
-        self.write( comments_json )
+            if comments:
+                comments_json = {}
+
+                for key, c in comments.iteritems():
+                    comments_json[key] = {  "user"   : c.user_name,
+                                            "comment": c.post_comment,
+                                            "created": c.created.strftime("%b %d, %Y") }
+                comments_json = json.dumps( comments_json )
+
+            self.write( comments_json )
+
+        else:
+            self.redirect("/")
+
+    def post(self):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login") # bad cookie
+                return
+
+        post_title = self.request.get('page')
+        comment = cgi.escape(self.request.get('comment'), quote= True)
+
+        post = getPostbytitle(post_title)
+
+        if comment:
+            c = Comments( parent      = get_dbkey(),
+                          user_id     = u.key().id(),
+                          user_name   = u.user_name,
+                          post_id     = post.key().id(),
+                          post_title  = post_title,
+                          post_comment= comment,
+                          state       = True)
+            c.put()
+
+            blog_comments = memcache.get("blog_comments")
+
+            if blog_comments is None:
+                make_cache()
+                blog_comments = memcache.get("blog_comments")
+
+            if blog_comments is None: # still empty? easy peasy
+                # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
+                blog_comments = { str(post.key().id()) : { post_title : { str(c.key().id()) : c }}}
+            else:
+                # comments[idpost][post_title][idcomment] = obj_comment                         set
+                if str(post.key().id()) in blog_comments:
+                    blog_comments[str(post.key().id())][post_title][str(c.key().id())] = c
+                else:
+                    blog_comments[str(post.key().id())] = { post_title : { str(c.key().id()) : c }}
+
+            memcache.set("blog_comments", blog_comments)
+
+            #update post info in the db and later in the cache
+            post.comments += 1 #ammount of comments++
+            post.put()
+
+            #update user statics
+            u.comments += 1
+            u.put()
+
+            users = memcache.get("blog_users")
+            users[str(u.key().id())] = u
+            memcache.set("blog_users", users)
+
+            blog_posts = memcache.get("blog_posts")
+            blog_posts[post.key().id()] = post
+            memcache.set("blog_posts", blog_posts)
+
+            calc_posts_statics("comments")
+            #self.response.headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = json.dumps({"operation": "success"})
+            self.write(response)
+
+        else:
+            error = "A empty comment ... Jhon travolta is confused. <br>"
+            error += '<iframe src="//giphy.com/embed/rCAVWjzASyNlm" width="480" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="http://giphy.com/gifs/confused-lego-travolta-rCAVWjzASyNlm">via GIPHY</a></p>'
+            self.render_post(post = post, title = post_title, commentError = error)
+
+class testHandler(Handler):
+    def get(self):
+        pass
+
+    def post(self):
+        user_cookie_str = self.request.cookies.get('user_id')
+
+        if user_cookie_str: # if cookie exist
+            u = valid_cookie(user_cookie_str)
+
+            if not u:
+                self.redirect("/login") # bad cookie
+                return
+
+
+
+        post = getPostbytitle(post_title)
+
+        if comment:
+            c = Comments( parent      = get_dbkey(),
+                          user_id     = u.key().id(),
+                          user_name   = u.user_name,
+                          post_id     = post.key().id(),
+                          post_title  = post_title,
+                          post_comment= comment,
+                          state       = True)
+            c.put()
+
+            blog_comments = memcache.get("blog_comments")
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
 
 app = webapp2.WSGIApplication([('/',             MainHandler),
+                               ('/test',         testHandler),
                                ('/search'      + PAGE_RE, SearchHandler),
                                ('/login/?',      LoginHandler),
                                ('/logout/?',     LogoutHandler),
@@ -1045,6 +1084,6 @@ app = webapp2.WSGIApplication([('/',             MainHandler),
                                ('/post/new/?',   NewPost),
                                ('/post'        + PAGE_RE, MainHandler),
                                ('/disable/'    + NUM_RE, DisableHandler),
-                               ('/getcomments' + PAGE_RE, CommentsHandler),
+                               ('/getcomments',  CommentsHandler),
                                (PAGE_RE,         MainHandler),
                                 ], debug=True)
