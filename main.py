@@ -615,7 +615,7 @@ class MainHandler(Handler):
             if comments:
                 comments = OrderedDict(sorted(comments.items(), reverse=True))
 
-            title = post.title[1:]
+            title = title.replace("_", " ")[1:]
 
             topten_comm_posts = None
             topten_view_posts = None
@@ -661,11 +661,6 @@ class MainHandler(Handler):
 
         else:
             self.error(404)
-            # error = "The post that you looking for does not exist, try again bro or go <a href='/'>Home</a>."
-            # self.render("error.html", error=error, user=None)
-
-
-
 
 
 class UserPageHandler(Handler):
@@ -948,12 +943,14 @@ class SearchHandler(Handler):
 
 class CommentsHandler(Handler):
     def get(self):
+        page = self.request.get('page')
 
-        if self.request.get('page'):
-
-            page = "/" + self.request.get('page')
+        if page:
+            page = "/" + page
 
             comments = getCommentsbyTitle( page )
+
+            logging.error( comments )
             comments_json = "null"
 
             if comments:
@@ -1034,47 +1031,12 @@ class CommentsHandler(Handler):
             response = json.dumps({"operation": "success"})
             self.write(response)
 
-        else:
-            error = "A empty comment ... Jhon travolta is confused. <br>"
-            error += '<iframe src="//giphy.com/embed/rCAVWjzASyNlm" width="480" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="http://giphy.com/gifs/confused-lego-travolta-rCAVWjzASyNlm">via GIPHY</a></p>'
-            self.render_post(post = post, title = post_title, commentError = error)
-
-class testHandler(Handler):
-    def get(self):
-        pass
-
-    def post(self):
-        user_cookie_str = self.request.cookies.get('user_id')
-
-        if user_cookie_str: # if cookie exist
-            u = valid_cookie(user_cookie_str)
-
-            if not u:
-                self.redirect("/login") # bad cookie
-                return
-
-
-
-        post = getPostbytitle(post_title)
-
-        if comment:
-            c = Comments( parent      = get_dbkey(),
-                          user_id     = u.key().id(),
-                          user_name   = u.user_name,
-                          post_id     = post.key().id(),
-                          post_title  = post_title,
-                          post_comment= comment,
-                          state       = True)
-            c.put()
-
-            blog_comments = memcache.get("blog_comments")
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 NUM_RE = r'((?:[0-9]+/?)*)'
 
 app = webapp2.WSGIApplication([('/',             MainHandler),
-                               ('/test',         testHandler),
                                ('/search'      + PAGE_RE, SearchHandler),
                                ('/login/?',      LoginHandler),
                                ('/logout/?',     LogoutHandler),
@@ -1084,6 +1046,6 @@ app = webapp2.WSGIApplication([('/',             MainHandler),
                                ('/post/new/?',   NewPost),
                                ('/post'        + PAGE_RE, MainHandler),
                                ('/disable/'    + NUM_RE, DisableHandler),
-                               ('/getcomments',  CommentsHandler),
+                               ('/comments',     CommentsHandler),
                                (PAGE_RE,         MainHandler),
                                 ], debug=True)
