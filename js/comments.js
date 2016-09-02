@@ -28,7 +28,7 @@ function loadComments() {
     }).done(function(data) {
         if ( data ){
 
-            for (var i = data.length -1; i > 0 ; i--) {
+            for (var i = data.length -1; i >= 0 ; i--) {
                 $postComments.append("<div class='user-comments'>\
                                          <h4><a href='/user/"+ data[i][1].user + "'>"+ data[i][1].user +"</a>: ("+ data[i][1].created +")</h4>\
                                          <textarea class='comment' readonly>"+ data[i][1].comment +"</textarea>\
