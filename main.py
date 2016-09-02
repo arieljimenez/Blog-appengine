@@ -236,7 +236,6 @@ def make_cache():
     memcache.set("blog_comments", blog_comments)
 
     logging.error("took %s caching all the %s comments " % (time.time() - time_spend, len(blog_comments)))
-    logging.error(blog_comments )
 
     #rankings
     time_spend = time.time()
@@ -295,9 +294,14 @@ def calc_posts_statics(calc="all"):
 
     if calc == "comments" or calc == "all":
         topten_comm_posts = []
+        comments = memcache.get("blog_comments")
+
         comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY comments DESC LIMIT 10",  get_dbkey())
 
         for post in comm_posts:
+            if post.title in comments: ##corrects the ammount of comments
+                post.comments = len(comments[post.title])
+
             topten_comm_posts.append([post.title, post.comments, post])
 
         memcache.set("topten_comm_posts", topten_comm_posts)
@@ -952,7 +956,6 @@ class CommentsHandler(Handler):
 
             comments = getCommentsbyTitle( page )
 
-            logging.error( comments )
             comments_json = "null"
 
             if comments:
