@@ -108,8 +108,6 @@ def check_secure_val(h):
         return val
 
 def get_user_by_name(name):
-    #users = db.GqlQuery("SELECT * FROM Blog_Users")
-    # better check from cache
 
     blog_users = memcache.get("blog_users")
 
@@ -212,12 +210,6 @@ def make_cache():
 
     memcache.set("blog_users", blog_users)
 
-    # COMMENTS DOC
-
-    # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
-    # comments[idpost][post_title][idcomment]                                       get
-    # comments[idpost][post_title][idcomment] = obj_comment                         set
-
     time_spend = time.time() #in your marks....reeedy...GO!
     blog_comments = {}
 
@@ -226,12 +218,8 @@ def make_cache():
     for comment in comments:
         if not comment.post_title in blog_comments:
             blog_comments[comment.post_title] = { str(comment.key().id()) : comment }
-            # OLD WAYS #
-            # blog_comments[str(comment.post_id)] = { comment.post_title : { str(comment.key().id()) : comment } }
-            #blog_comments[comment.post_id][comment.post_title] = { comment.key().id(): comment }
         else:
             blog_comments[comment.post_title][str(comment.key().id())] = comment
-            # blog_comments[str(comment.post_id)][comment.post_title][str(comment.key().id())] = comment
 
     memcache.set("blog_comments", blog_comments)
 
@@ -343,54 +331,9 @@ def calc_posts_statics(calc="all"):
         memcache.set("disabled_posts", disabled_posts)
 
 
-    # for key, value in blog_posts.items():
-    #     logging.error("Error %s / %s " % (key, value))
-
-    # for post_id, post in blog_posts.items():
-
-    #     if calc == "comments" or calc == "all":
-    #         for x in range(0, len(topten_comm_posts)):
-    #             if post.comments >= topten_comm_posts[x][1]:
-    #                 topten_comm_posts.pop()
-    #                 topten_comm_posts.insert(x, [post.title, post.comments, post])
-    #                 break
-
-    #         memcache.set("topten_comm_posts", topten_comm_posts)
-
-    #     if calc == "views" or calc == "all":
-    #         for x in range(0, len(topten_view_posts)):
-
-    #             if post.title == topten_view_posts[x][0]:
-    #                 if post.views > topten_view_posts[x][1]:
-    #                     topten_view_posts[x][1] = post.views
-    #                     topten_view_posts[x][2] = post
-    #                     break
-
-    #             elif post.views > topten_view_posts[x][1]:
-    #                 if len(topten_view_posts) > 10:
-    #                     topten_view_posts.pop()
-
-    #                 topten_view_posts.insert(x, [post.title, post.views, post])
-    #                 break
-
-    #             elif len(topten_view_posts) < 10:
-    #                 topten_view_posts.append([post.title, post.views, post])
-    #                 break
-
-
-
-    #         memcache.set("topten_view_posts", topten_view_posts)
-
-
 def setDisablePost(title_id):
     posts = memcache.get("blog_posts")
     post = posts[title_id]
-
-    # if post.state :
-    #     post.estate = False
-
-    # else:
-    #     post.estate = True
 
     post.state = not post.state
 
