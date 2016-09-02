@@ -65,11 +65,13 @@
                                 <th class="text-center"> Comments  </th>
                             </tr>
                             {% for p in topten_comm_posts %}
-                            <tr>
-                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
-                                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
-                                <td class="text-center">{{ p[2].comments }} </td>
-                            </tr>
+                                {% if p[2].state %}
+                                <tr>
+                                    <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                                    <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                                    <td class="text-center">{{ p[2].comments }} </td>
+                                </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -86,11 +88,13 @@
                                 <th class="text-center"> Views </th>
                             </tr>
                             {% for p in topten_view_posts %}
-                            <tr>
-                                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
-                                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
-                                <td class="text-center"> {{ p[2].views }}</td>
-                            </tr>
+                                {% if p[2].state %}
+                                <tr>
+                                    <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                                    <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                                    <td class="text-center"> {{ p[2].views }}</td>
+                                </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>

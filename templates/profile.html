@@ -2,7 +2,13 @@
 
 {% block content %}
 
+{% if user_profile.user_name == user.user_name %}
 <h1 class="underline"> Wellcome back {{ user_profile.user_name }}!</h1>
+
+{% else %}
+<h1 class="underline"> Profile of {{ user_profile.user_name }}</h1>
+{% endif %}
+
 <div id="profile">
     <table class="profile">
         <tbody>

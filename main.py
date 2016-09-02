@@ -193,7 +193,7 @@ def make_cache():
         logging.error("Ther is no admin, lets create one")
 
         admin = Blog_Users( parent = get_dbkey(),
-                            user_name="Admin",
+                            user_name="admin",
                             user_pass= hash_str("159357"),
                             user_type = "admin",
                             comments  = 0,
@@ -212,10 +212,13 @@ def make_cache():
 
     time_spend = time.time() #in your marks....reeedy...GO!
     blog_comments = {}
+    total_comments = 0
 
     comments = db.GqlQuery("SELECT * FROM Comments WHERE ANCESTOR IS :1",  get_dbkey())
 
     for comment in comments:
+        total_comments += 1
+
         if not comment.post_title in blog_comments:
             blog_comments[comment.post_title] = { str(comment.key().id()) : comment }
         else:
@@ -231,6 +234,12 @@ def make_cache():
     calc_posts_statics()
 
     logging.error("took %s caching the posts rankings" % (time.time() - time_spend))
+
+    total_activity = 0
+
+    total_activity = len(blog_posts) + total_comments
+
+    memcache.set("total_activity", total_activity)
 
 
 
@@ -284,7 +293,7 @@ def calc_posts_statics(calc="all"):
         topten_comm_posts = []
         comments = memcache.get("blog_comments")
 
-        comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY comments DESC LIMIT 10",  get_dbkey())
+        comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1  ORDER BY comments DESC LIMIT 10",  get_dbkey())
 
         for post in comm_posts:
             if post.title in comments: ##corrects the ammount of comments
@@ -297,38 +306,12 @@ def calc_posts_statics(calc="all"):
 
     if calc == "views" or calc == "all":
         topten_view_posts = []
-        view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 AND state = True ORDER BY views DESC LIMIT 10",  get_dbkey())
+        view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1  ORDER BY views DESC LIMIT 10",  get_dbkey())
 
         for post in view_posts:
             topten_view_posts.append([post.title, post.views, post])
 
         memcache.set("topten_view_posts", topten_view_posts)
-
-    if calc == "admin":
-        topten_comm_posts = []
-        comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY comments DESC LIMIT 10",  get_dbkey())
-
-        for post in comm_posts:
-            topten_comm_posts.append([post.title, post.comments, post])
-
-        memcache.set("topten_comm_posts", topten_comm_posts)
-
-
-        topten_view_posts = []
-        view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1 ORDER BY views DESC LIMIT 10",  get_dbkey())
-
-        for post in view_posts:
-            topten_view_posts.append([post.title, post.views, post])
-
-        memcache.set("topten_view_posts", topten_view_posts)
-
-        disabled_posts = []
-        disabled = db.GqlQuery("SELECT * FROM Blog_Posts WHERE state = False AND ANCESTOR IS :1 ORDER BY comments DESC",  get_dbkey())
-
-        for post in disabled:
-            disabled_posts.append([post.title, post.views, post])
-
-        memcache.set("disabled_posts", disabled_posts)
 
 
 def setDisablePost(title_id):
@@ -554,9 +537,10 @@ class MainHandler(Handler):
 
         if not title == "Home" :
 
-            if not post.state and not u.user_type == "admin":
-                self.error(404)
-                return
+            if not post.state:
+                if not u or not u.user_type == "admin":
+                    self.error(404)
+                    return
 
             comments = getCommentsbyTitle(title)
 
@@ -575,7 +559,6 @@ class MainHandler(Handler):
             calc_posts_statics("views")
             topten_comm_posts = memcache.get("topten_comm_posts")
             topten_view_posts = memcache.get("topten_view_posts")
-
 
         self.render(page,
                     post  = post,
@@ -630,7 +613,8 @@ class UserPageHandler(Handler):
         if user_data:
             title = "%s is profile " % user_data.user_name
 
-            total_activity = len(memcache.get("blog_posts")) + len(memcache.get("blog_comments"))
+            total_activity = memcache.get("total_activity")
+
             #totalposts = 50;
 
             self.render("profile.html",
@@ -735,6 +719,10 @@ class NewPost(Handler):
 
             calc_posts_statics()
 
+            total_activity = memcache.get("total_activity")
+            total_activity += 1
+            memcache.set("total_activity", total_activity)
+
             self.redirect("/post%s" % title)
             return
         else:
@@ -791,15 +779,14 @@ class AdminPanel(Handler):
             self.redirect("/login")
             return
 
-        calc_posts_statics("admin")
+        calc_posts_statics()
         topten_comm_posts = memcache.get("topten_comm_posts")
         topten_view_posts = memcache.get("topten_view_posts")
-        disabled_posts    = memcache.get("disabled_posts")
 
         posts = memcache.get("blog_posts")
 
         topics = {}
-        disabled = {}
+        disabled_posts = {}
 
         for key, p in posts.iteritems():
 
@@ -807,6 +794,11 @@ class AdminPanel(Handler):
                 topics[p.topic] = 1
             else:
                 topics[p.topic] += 1
+
+            if not p.state:
+                disabled_posts[p.title] = p
+
+        logging.error( disabled_posts )
 
 
         self.render("admin_panel.html",
@@ -829,7 +821,9 @@ class SearchHandler(Handler):
             matched_posts = {}
             posts = memcache.get("blog_posts")
 
-            query = query[1:].lower()
+            query = query[1:].lower().replace("_", " ")
+
+            logging.error( query )
 
             for key, p in posts.iteritems():
                 if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower():
@@ -975,6 +969,10 @@ class CommentsHandler(Handler):
             blog_posts = memcache.get("blog_posts")
             blog_posts[post.key().id()] = post
             memcache.set("blog_posts", blog_posts)
+
+            total_activity = memcache.get("total_activity")
+            total_activity += 1
+            memcache.set("total_activity", total_activity)
 
             calc_posts_statics("comments")
             #self.response.headers = {'Content-Type': 'application/json; charset=utf-8'}

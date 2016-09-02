@@ -215,6 +215,11 @@ input, textarea {
     font-weight: 500;
 }
 
+.enable {
+    color: darkgreen;
+    font-weight: 500;
+}
+
 .post {
     background-color: #e2e4e3;
     border-color: dodgerblue;

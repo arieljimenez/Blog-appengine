@@ -29,11 +29,15 @@
             <tr>
         {% endif %}
                 <td class="center">{{ loop.index }}</td>
-                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                 <td class="text-center"> {{ p[2].modified }}</td>
                 <td class="text-center"> {{ p[2].comments }}</td>
-                <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                {% if p[2].state %}
+                    <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                {% else %}
+                    <td class="enable"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                {% endif %}
             </tr>
     {% endfor %}
 
@@ -61,11 +65,16 @@
             <tr>
         {% endif %}
                 <td class="center">{{ loop.index }}</td>
-                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/?topics={{ p[2].topic }}">{{ p[2].topic }}</a>)</small></td>
+                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
                 <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                 <td class="text-center"> {{ p[2].modified }}</td>
                 <td class="text-center"> {{ p[2].views }}</td>
-                <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+
+                {% if p[2].state %}
+                    <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                {% else %}
+                    <td class="enable"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                {% endif %}
             </tr>
     {% endfor %}
         </tbody>
@@ -82,13 +91,13 @@
                 <th>Date</th>
                 <th>Views</th>
             </tr>
-        {% for p in disabled_posts %}
+        {% for title, p in disabled_posts.iteritems() %}
             <tr>
-                <td> <a href='/post{{ p[0] }}'>{{ p[0].replace('_', ' ')[1:] }}</a></td>
-                <td class='text-center'> <a href='/user/{{ p[2].user }}'>{{ p[2].user }} </a></td>
-                <td class='text-center'> {{ p[2].modified }}</td>
-                <td class='text-center'> {{ p[2].views }}</td>
-                <td class='error'> <a href='/disable/{{ p[2].key().id() }}'> Enable </a></td>
+                <td> <a href='/post{{ title }}'>{{ title.replace('_', ' ')[1:] }}</a></td>
+                <td class='text-center'> <a href='/user/{{ p.user }}'>{{ p.user }} </a></td>
+                <td class='text-center'> {{ p.modified }}</td>
+                <td class='text-center'> {{ p.views }}</td>
+                <td class='enable'> <a href='/disable/{{ p.key().id() }}'> Enable </a></td>
             </tr>
         {% endfor %}
         </tbody>
