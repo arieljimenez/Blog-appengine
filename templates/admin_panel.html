@@ -34,9 +34,9 @@
                 <td class="text-center"> {{ p[2].modified }}</td>
                 <td class="text-center"> {{ p[2].comments }}</td>
                 {% if p[2].state %}
-                    <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                    <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
                 {% else %}
-                    <td class="enable"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                    <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
                 {% endif %}
             </tr>
     {% endfor %}
@@ -71,9 +71,9 @@
                 <td class="text-center"> {{ p[2].views }}</td>
 
                 {% if p[2].state %}
-                    <td class="disable"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
+                    <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
                 {% else %}
-                    <td class="enable"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
+                    <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
                 {% endif %}
             </tr>
     {% endfor %}
@@ -97,7 +97,7 @@
                 <td class='text-center'> <a href='/user/{{ p.user }}'>{{ p.user }} </a></td>
                 <td class='text-center'> {{ p.modified }}</td>
                 <td class='text-center'> {{ p.views }}</td>
-                <td class='enable'> <a href='/disable/{{ p.key().id() }}'> Enable </a></td>
+                <td class='enable center'> <a href='/disable/{{ p.key().id() }}'> Enable </a></td>
             </tr>
         {% endfor %}
         </tbody>

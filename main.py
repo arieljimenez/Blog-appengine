@@ -899,12 +899,18 @@ class CommentsHandler(Handler):
                 comments_json = {}
 
                 for key, c in comments.iteritems():
-                    comments_json[key] = {  "user"   : c.user_name,
+                    comments_json[c.created.strftime("%y-%m-%d %H:%M:%S.%f")] = {  "user"   : c.user_name,
+                    # comments_json[key] = {  "user"   : c.user_name,
                                             "comment": c.post_comment,
-                                            "created": c.created.strftime("%b %d, %Y") }
-                comments_json = json.dumps( comments_json )
+                                            "created"   : c.created.strftime("%b %d, %Y "),
+                                            "time": str(c.created.strftime("%y-%m-%d %H:%M:%S.%f"))}
 
-            self.write( comments_json )
+
+
+                comments_json = json.dumps( sorted(comments_json.iteritems()) )
+            #logging.error( sorted(comments_json.iteritems()) )
+
+            self.write( comments_json  )
 
         else:
             self.redirect("/")

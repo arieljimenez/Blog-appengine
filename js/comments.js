@@ -9,6 +9,16 @@ function loadComments() {
 
     $postComments.children().remove();
 
+
+    var sort_by = function(field, reverse, primer){
+        var key = function (x) {return primer ? primer(x[field]) : x[field]};
+
+        return function (a,b) {
+            var A = key(a), B = key(b);
+            return ( (A < B) ? -1 : ((A > B) ? 1 : 0) ) * [-1,1][+!!reverse];
+        }
+    }
+
     $.ajax({
         url: "/comments",
         type: "GET",
@@ -17,12 +27,21 @@ function loadComments() {
 
     }).done(function(data) {
         if ( data ){
-            $.each( data, function( key, val ) {
+
+            for (var i = data.length -1; i > 0 ; i--) {
                 $postComments.append("<div class='user-comments'>\
-                                        <h4><a href='/user/"+ val.user + "'>"+ val.user +"</a>: ("+ val.created +")</h4>\
-                                        <textarea class='comment' readonly>"+ val.comment +"</textarea>\
-                                    </div>");
-            });
+                                         <h4><a href='/user/"+ data[i][1].user + "'>"+ data[i][1].user +"</a>: ("+ data[i][1].created +")</h4>\
+                                         <textarea class='comment' readonly>"+ data[i][1].comment +"</textarea>\
+                                     </div>");
+            }
+
+            // $.each( data[0], function( key, val ) {
+            //     // load comments by part
+            //     $postComments.append("<div class='user-comments'>\
+            //                             <h4><a href='/user/"+ val.user + "'>"+ val.user +"</a>: ("+ val.created +")</h4>\
+            //                             <textarea class='comment' readonly>"+ val.comment +"</textarea>\
+            //                         </div>");
+            // });
 
             $("#comments-ammount").text( Object.keys( data ).length );
 
