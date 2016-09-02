@@ -205,8 +205,6 @@ def make_cache():
 
         logging.error("admin created")
 
-
-
     for user in users:
          blog_users[str(user.key().id())] = user
 
@@ -215,6 +213,7 @@ def make_cache():
     memcache.set("blog_users", blog_users)
 
     # COMMENTS DOC
+
     # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
     # comments[idpost][post_title][idcomment]                                       get
     # comments[idpost][post_title][idcomment] = obj_comment                         set
@@ -225,15 +224,19 @@ def make_cache():
     comments = db.GqlQuery("SELECT * FROM Comments WHERE ANCESTOR IS :1",  get_dbkey())
 
     for comment in comments:
-        if not comment.post_id in blog_comments:
-            blog_comments[str(comment.post_id)] = { comment.post_title : { str(comment.key().id()) : comment } }
+        if not comment.post_title in blog_comments:
+            blog_comments[comment.post_title] = { str(comment.key().id()) : comment }
+            # OLD WAYS #
+            # blog_comments[str(comment.post_id)] = { comment.post_title : { str(comment.key().id()) : comment } }
             #blog_comments[comment.post_id][comment.post_title] = { comment.key().id(): comment }
         else:
-            blog_comments[comment.post_id][comment.post_title][comment.key().id()] = comment
+            blog_comments[comment.post_title][str(comment.key().id())] = comment
+            # blog_comments[str(comment.post_id)][comment.post_title][str(comment.key().id())] = comment
 
     memcache.set("blog_comments", blog_comments)
 
     logging.error("took %s caching all the %s comments " % (time.time() - time_spend, len(blog_comments)))
+    logging.error(blog_comments )
 
     #rankings
     time_spend = time.time()
@@ -284,10 +287,8 @@ def getCommentsbyTitle(title):
         make_cache()
         blog_comments = memcache.get("blog_comments")
 
-    for key, value in blog_comments.items():
-        for key2, value2 in value.items():
-            if key2 == title:
-                return value2
+    if title in blog_comments:
+        return blog_comments[title]
 
 
 def calc_posts_statics(calc="all"):
@@ -627,6 +628,7 @@ class MainHandler(Handler):
             calc_posts_statics("views")
             topten_comm_posts = memcache.get("topten_comm_posts")
             topten_view_posts = memcache.get("topten_view_posts")
+
 
         self.render(page,
                     post  = post,
@@ -999,14 +1001,16 @@ class CommentsHandler(Handler):
                 blog_comments = memcache.get("blog_comments")
 
             if blog_comments is None: # still empty? easy peasy
+                blog_comments = { post_title : { str(c.key().id()) : c } }
+                #old
                 # comments { idpost : { post_title : { comment_id : comment_obj }}}             struct
-                blog_comments = { str(post.key().id()) : { post_title : { str(c.key().id()) : c }}}
+                #blog_comments = { str(post.key().id()) : { post_title : { str(c.key().id()) : c }}}
             else:
                 # comments[idpost][post_title][idcomment] = obj_comment                         set
-                if str(post.key().id()) in blog_comments:
-                    blog_comments[str(post.key().id())][post_title][str(c.key().id())] = c
+                if post_title in blog_comments:
+                    blog_comments[post_title][str(c.key().id())] = c
                 else:
-                    blog_comments[str(post.key().id())] = { post_title : { str(c.key().id()) : c }}
+                    blog_comments[post_title] = { str(c.key().id()) : c }
 
             memcache.set("blog_comments", blog_comments)
 
