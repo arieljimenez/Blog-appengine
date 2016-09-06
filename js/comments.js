@@ -45,6 +45,7 @@ function loadComments() {
 
         } else {
              $postComments.append( "<span>Be the <strong>first</strong> in comment this post! :D</span>");
+             $( "#load-more-comments" ).fadeOut("slow");
         }
 
         clearTimeout(RequeestTimeout);
@@ -114,9 +115,7 @@ function rationalizeComments() {
         commentsLeftToShow--;
 
         if( commentsLeftToShow == 0 ){
-            $( "#load-more-comments" ).fadeOut( "slow", function() {
-                $( "#load-more-comments" ).remove();
-              });
+            $( "#load-more-comments" ).fadeOut( "slow");
 
             break;
         }
