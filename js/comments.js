@@ -1,14 +1,18 @@
+var commentsLeftToShow  = 0;
+var comments_limit      = 5; // limit to show per clic/load
+var $postComments       = $(".post-comments");
+var $data               = null;
+
+
 function loadComments() {
 
     var page = { "page": $("title").text().replace(/ /g, "_")};
-    var $postComments = $(".post-comments");
 
     var RequeestTimeout = setTimeout(function() {
             $("input:first").text("Failed to get resources.");
     }, 5000);
 
     $postComments.children().remove();
-
 
     var sort_by = function(field, reverse, primer){
         var key = function (x) {return primer ? primer(x[field]) : x[field]};
@@ -27,14 +31,9 @@ function loadComments() {
 
     }).done(function(data) {
         if ( data ){
-
-            for (var i = data.length -1; i >= 0 ; i--) {
-                $postComments.append("<div class='user-comments'>\
-                                         <h4><a href='/user/"+ data[i][1].user + "'>"+ data[i][1].user +"</a>: ("+ data[i][1].created +")</h4>\
-                                         <textarea class='comment' readonly>"+ data[i][1].comment +"</textarea>\
-                                     </div>");
-            }
-
+            $data = data;
+            commentsLeftToShow = data.length;
+            rationalizeComments ();
             // $.each( data[0], function( key, val ) {
             //     // load comments by part
             //     $postComments.append("<div class='user-comments'>\
@@ -42,7 +41,6 @@ function loadComments() {
             //                             <textarea class='comment' readonly>"+ val.comment +"</textarea>\
             //                         </div>");
             // });
-
             $("#comments-ammount").text( Object.keys( data ).length );
 
         } else {
@@ -102,11 +100,37 @@ function addComment() {
     return false;
 };
 
-$( document ).ready( loadComments );
+
+function rationalizeComments() {
+
+    var count = comments_limit;
+
+    for (var i = commentsLeftToShow -1; count > 0 ; i--) {
+        $postComments.append("<div class='user-comments'>\
+                                 <h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4>\
+                                 <textarea class='comment' readonly>"+ $data[i][1].comment +"</textarea>\
+                             </div>");
+        count--;
+        commentsLeftToShow--;
+
+        if( commentsLeftToShow == 0 ){
+            $( "#load-more-comments" ).fadeOut( "slow", function() {
+                $( "#load-more-comments" ).remove();
+              });
+
+            break;
+        }
+
+    }
+}
 
 $("form").submit( function ( event ) {
     event.preventDefault();
-
     addComment();
-    //return false;
 } );
+
+$("#load-more-comments").click( function() {
+    rationalizeComments();
+});
+
+$( document ).ready( loadComments );

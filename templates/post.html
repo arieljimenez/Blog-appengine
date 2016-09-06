@@ -26,9 +26,6 @@
         <hr>
         <!-- COMMENTS -->
         <h3>Comments:</h3>
-        <div class="post-comments">
-            <h4>L o a d i n g   c o m m e n t s . . . </h4>
-        </div>
 
         {% if user %}
         <div class="user-comments">
@@ -39,12 +36,16 @@
                 <div id="comment-error" class="error"></div>
             </form>
         </div>
-
         {% else %}
         <div class="user-comments">
             <h2>You must <a href="/login">login</a> to leave a comment.</h2>
         </div>
         {% endif %}
+        <div class="post-comments">
+            <h4>L o a d i n g &nbsp;&nbsp;&nbsp;c o m m e n t s . . . </h4>
+        </div>
+        <button id='load-more-comments' class='more-comments'>Load more comments</button>
+
 
     </div>
 
