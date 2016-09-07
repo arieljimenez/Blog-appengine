@@ -105,12 +105,19 @@ function addComment() {
 
 
 function editComment(id){
-    if( $("textarea#"+id).siblings().length > 1 ){
-        console.log("ya hay");
-    } else {
 
-    $("textarea#"+id).attr({class: "comment" });
-    $("textarea#"+id).parent().append("<span class='btn'>Save</span>");
+    if( $("textarea#"+id).siblings().length < 2 ){
+        $(".user-comments").children("span").remove();
+
+
+
+        $("textarea#"+id).removeAttr("readonly").focusout( function () {
+            $( this ).attr("readonly","");
+            $(".user-comments").children("span").remove();
+        });
+
+        $("textarea#"+id).focus();
+        $("textarea#"+id).parent().append("<span class='btn save'>Save</span>");
     }
 
 }
@@ -157,5 +164,6 @@ $("#load-more-comments").click( function() {
 
 
 $( document ).ready( loadComments );
+
 
 
