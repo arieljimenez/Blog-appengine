@@ -350,6 +350,43 @@ input, textarea {
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
 }
+
+.comment-header {
+    display: flex;
+}
+
+.btn {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 5px;
+
+    background: #4CAF50;
+    color: white;
+    font-size: 1rem;
+    border: 0px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+    -webkit-transition: all 0.5s ease;
+     -moz-transition: all 0.5s ease;
+       -o-transition: all 0.5s ease;
+      -ms-transition: all 0.5s ease;
+          transition: all 0.5s ease;
+}
+
+.btn:hover {
+    color: red;
+}
+
+.user-comments .edit-comment {
+    display: none;
+}
+
+.user-comments:hover .edit-comment {
+    display: flex;
+}
+
 /* ###################################### */
 /*
  las esquinas 1 y 3 seran las

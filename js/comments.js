@@ -2,6 +2,7 @@ var commentsLeftToShow  = 0;
 var comments_limit      = 5; // limit to show per clic/load
 var $postComments       = $(".post-comments");
 var $data               = null;
+var user                = $("#user").text();
 
 
 function loadComments() {
@@ -102,15 +103,37 @@ function addComment() {
 };
 
 
+
+function editComment(id){
+    if( $("textarea#"+id).siblings().length > 1 ){
+        console.log("ya hay");
+    } else {
+
+    $("textarea#"+id).attr({class: "comment" });
+    $("textarea#"+id).parent().append("<span class='btn'>Save</span>");
+    }
+
+}
+
+
 function rationalizeComments() {
 
     var count = comments_limit;
 
     for (var i = commentsLeftToShow -1; count > 0 ; i--) {
-        $postComments.append("<div class='user-comments'>\
-                                 <h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4>\
-                                 <textarea class='comment' readonly>"+ $data[i][1].comment +"</textarea>\
-                             </div>");
+
+            if( $data[i][1].user == user ){
+                $postComments.append("<div class='user-comments'>\
+                                        <div class='comment-header'><h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4><span class='btn edit-comment'><a href='javascript:editComment("+$data[i][1].id +")'>Edit</a></span> </div>\
+                                        <textarea id='"+ $data[i][1].id +"' class='comment' readonly>"+ $data[i][1].comment +"</textarea>\
+                                    </div>");
+            } else {
+                $postComments.append("<div class='user-comments'>\
+                                        <div class='comment-header'><h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4></div>\
+                                        <textarea class='comment' readonly>"+ $data[i][1].comment +"</textarea>\
+                                    </div>");
+            }
+
         count--;
         commentsLeftToShow--;
 
@@ -132,4 +155,7 @@ $("#load-more-comments").click( function() {
     rationalizeComments();
 });
 
+
 $( document ).ready( loadComments );
+
+

@@ -20,7 +20,7 @@
                 {% if user.user_type == "admin" %}
                     <li><a href="/adminpanel">Admin Panel</a> | </li>
                 {% endif %}
-                <li><a href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a href="/logout" style="color: red;"> (Logout)</a></li>
+                <li><a id="user" href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a class="error" href="/logout"> (Logout)</a></li>
             {% else %}
                 <li><a href="/">Home </a>|</li>
                 <li><a href="/login">Login </a>|</li>

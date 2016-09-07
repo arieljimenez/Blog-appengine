@@ -84,8 +84,8 @@
         <div class="user-comments">
             <form id="new-comment" class="comment" method="post">
                 <h4>{{ user.user_name }}:</h4>
-                <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment" required></textarea>
-                <button class="round" type="submit">create</button>
+                <textarea class="tarea-comments" name="comment" placeholder="Add a comment" required></textarea>
+                <button class="round add-new-comment" type="submit">create</button>
                 <p id="comment-error" class="error">{{ commentError | safe }}</p>
             </form>
         </div>

@@ -7,7 +7,7 @@ function loadData() {
         var query = $("input:first").val().replace(/ /g, "_");
         var $search_items = $("#search_items");
 
-        $search_items.children().remove();
+        $search_items.children().fadeOut("slow");
 
         var RequeestTimeout = setTimeout(function() {
             $("input:first").text("Failed to get resources.");
@@ -21,7 +21,7 @@ function loadData() {
         }).done(function(data) {
             if ( data ){
 
-                $("#main").children().remove();
+                $("#main").children().fadeOut("slow");
 
                 $.each( data, function( key, val ) {
                     $search_items.append("<li class='search_item'>\
@@ -51,7 +51,7 @@ var main = null;
 $("#search_input").keydown( function() {
     if ($("#search_input").val() == "" && $("#main").children().length == 0 ){
         main.clone().appendTo( $("#main") );
-        $("#search_items").children().remove();
+        $("#search_items").children().fadeOut("slow");
     }
 });
 

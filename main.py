@@ -902,10 +902,9 @@ class CommentsHandler(Handler):
                     comments_json[c.created.strftime("%y-%m-%d %H:%M:%S.%f")] = {  "user"   : c.user_name,
                     # comments_json[key] = {  "user"   : c.user_name,
                                             "comment": c.post_comment,
-                                            "created"   : c.created.strftime("%b %d, %Y "),
-                                            "time": str(c.created.strftime("%y-%m-%d %H:%M:%S.%f"))}
-
-
+                                            "created"   : c.created.strftime("%b %d, %Y"),
+                                            "id" : str(c.key().id()),
+                                            "time": c.created.strftime("%y-%m-%d %H:%M:%S.%f")}
 
                 comments_json = json.dumps( sorted(comments_json.iteritems()) )
             #logging.error( sorted(comments_json.iteritems()) )
