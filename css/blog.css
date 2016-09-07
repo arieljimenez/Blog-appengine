@@ -215,6 +215,7 @@ input, textarea {
     font-weight: 500;
 }
 
+
 .enable {
     color: darkgreen;
     font-weight: 500;
@@ -360,8 +361,6 @@ input, textarea {
     padding-right: 10px;
     margin-left: 5px;
 
-    background: #4CAF50;
-    color: white;
     font-size: 1rem;
     border: 0px;
     border-radius: 5px;
@@ -386,6 +385,18 @@ input, textarea {
 .user-comments:hover .edit-comment {
     display: flex;
 }
+
+.action {
+    background: #4CAF50;
+    color: white;
+}
+
+.success {
+    background-color: royalblue;
+    color: white;
+}
+
+
 
 /* ###################################### */
 /*

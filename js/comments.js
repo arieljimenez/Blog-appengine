@@ -35,13 +35,7 @@ function loadComments() {
             $data = data;
             commentsLeftToShow = data.length;
             rationalizeComments ();
-            // $.each( data[0], function( key, val ) {
-            //     // load comments by part
-            //     $postComments.append("<div class='user-comments'>\
-            //                             <h4><a href='/user/"+ val.user + "'>"+ val.user +"</a>: ("+ val.created +")</h4>\
-            //                             <textarea class='comment' readonly>"+ val.comment +"</textarea>\
-            //                         </div>");
-            // });
+
             $("#comments-ammount").text( Object.keys( data ).length );
 
         } else {
@@ -105,11 +99,8 @@ function addComment() {
 
 
 function editComment(id){
-
     if( $("textarea#"+id).siblings().length < 2 ){
         $(".user-comments").children("span").remove();
-
-
 
         $("textarea#"+id).removeAttr("readonly").focusout( function () {
             $( this ).attr("readonly","");
@@ -117,11 +108,36 @@ function editComment(id){
         });
 
         $("textarea#"+id).focus();
-        $("textarea#"+id).parent().append("<span class='btn save'>Save</span>");
+        $("textarea#"+id).parent().append("<a href='javascript:saveComment("+id+")'><span id='save' class='btn action'>Save</span></a>");
     }
-
 }
 
+function saveComment(id){
+    updatedComment = $("textarea#"+id).val();
+
+    $.ajax({
+        url: "/comments",
+        type: "GET",
+        dataType: 'json',
+        data : {"action": "updateComment", "id": id, "comment": updatedComment }
+
+    }).done( function( dataFromServer, status ) {
+
+        if ( status ){
+            $("textarea#"+id).attr("readonly","");
+            $("textarea#"+id).parent().append("<span id='success' class='btn success'>Comment edited</span></a>").fadeIn("slow");
+        //$("#save").fadeout(500);
+        $(".user-comments").children("span, a").fadeOut(700);
+            //$("#success").fadeOut("slow");
+        }
+
+    }).fail(function(e) {
+        console.log("e: "+ e);
+    });
+
+
+    return false;
+}
 
 function rationalizeComments() {
 
@@ -131,7 +147,7 @@ function rationalizeComments() {
 
             if( $data[i][1].user == user ){
                 $postComments.append("<div class='user-comments'>\
-                                        <div class='comment-header'><h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4><span class='btn edit-comment'><a href='javascript:editComment("+$data[i][1].id +")'>Edit</a></span> </div>\
+                                        <div class='comment-header'><h4><a href='/user/"+ $data[i][1].user + "'>"+ $data[i][1].user +"</a>: ("+ $data[i][1].created +")</h4><span class='btn action edit-comment'><a href='javascript:editComment("+$data[i][1].id +")'>Edit</a></span> </div>\
                                         <textarea id='"+ $data[i][1].id +"' class='comment' readonly>"+ $data[i][1].comment +"</textarea>\
                                     </div>");
             } else {
@@ -164,6 +180,8 @@ $("#load-more-comments").click( function() {
 
 
 $( document ).ready( loadComments );
+
+
 
 
 

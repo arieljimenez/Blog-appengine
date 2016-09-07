@@ -328,6 +328,23 @@ def setDisablePost(title_id):
 
     return post
 
+
+def update_comment(comment_id, updatedComment):
+    logging.error( updatedComment )
+    comment = Comments.get_by_id(int(comment_id), get_dbkey())
+
+    comment.post_comment = updatedComment
+
+
+    comment.put()
+
+    blog_comments = memcache.get("blog_comments")
+    blog_comments[comment.post_title][comment_id] = comment
+    memcache.set("blog_comments", blog_comments)
+
+    logging.error("finished of updating comment id %s" % comment_id)
+
+
 ############################################################################################################
 ###################################################### HANDLERS ############################################
 ############################################################################################################
@@ -885,7 +902,27 @@ class SearchHandler(Handler):
 
 
 class CommentsHandler(Handler):
+
     def get(self):
+        action = self.request.get('action')
+
+        if action == "updateComment":
+            comment_id = self.request.get('id')
+            updatedComment = self.request.get('comment')
+
+            logging.error("id: %s  comment: %s" % (comment_id, updatedComment))
+
+            update_comment(comment_id=comment_id, updatedComment=updatedComment)
+
+            comments_json = json.dumps( {"status": True})
+            #logging.error( sorted(comments_json.iteritems()) )
+
+            self.write( comments_json  )
+
+            return
+
+
+
         page = self.request.get('page')
 
         if page:
