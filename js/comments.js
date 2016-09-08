@@ -126,15 +126,12 @@ function saveComment(id){
         if ( status ){
             $("textarea#"+id).attr("readonly","");
             $("textarea#"+id).parent().append("<span id='success' class='btn success'>Comment edited</span></a>").fadeIn("slow");
-        //$("#save").fadeout(500);
         $(".user-comments").children("span, a").fadeOut(700);
-            //$("#success").fadeOut("slow");
         }
 
     }).fail(function(e) {
         console.log("e: "+ e);
     });
-
 
     return false;
 }
