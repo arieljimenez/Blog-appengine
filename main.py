@@ -230,15 +230,11 @@ def make_cache():
 
     #rankings
     time_spend = time.time()
-
     calc_posts_statics()
-
     logging.error("took %s caching the posts rankings" % (time.time() - time_spend))
 
     total_activity = 0
-
     total_activity = len(blog_posts) + total_comments
-
     memcache.set("total_activity", total_activity)
 
 
@@ -317,15 +313,11 @@ def calc_posts_statics(calc="all"):
 def setDisablePost(title_id):
     posts = memcache.get("blog_posts")
     post = posts[title_id]
-
     post.state = not post.state
-
     post.put()
 
     calc_posts_statics("comments")
-
     memcache.set("blog_posts", posts)
-
     return post
 
 
@@ -337,6 +329,18 @@ def update_comment(comment_id, updatedComment):
     blog_comments = memcache.get("blog_comments")
     blog_comments[comment.post_title][comment_id] = comment
     memcache.set("blog_comments", blog_comments)
+
+def get_comments_by_user(user):
+    #blog_comments[comment.post_title][str(comment.key().id())] = comment
+    comments = memcache.get("blog_comments")
+
+    for title, comment_id in comments.iteritems():
+        for key, comment in comment_id.iteritems():
+            if comment.user_name == user:
+                logging.error ( comment )
+
+
+
 
 ############################################################################################################
 ###################################################### HANDLERS ############################################
@@ -827,7 +831,7 @@ class SearchHandler(Handler):
             query = query[1:].lower().replace("_", " ")
 
             for key, p in posts.iteritems():
-                if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower():
+                if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower() or query in p.user.lower():
                     matched_posts[key] = {  "title"     : p.title,
                                             "topic"     : p.topic,
                                             "content"   : p.content,
@@ -899,6 +903,12 @@ class CommentsHandler(Handler):
             comments_json = json.dumps( {"status": True})
 
             self.write( comments_json  )
+
+            return
+
+        elif action == "getCommentsUser":
+            user = self.request.get('user')
+            comments = get_comments_by_user( user )
 
             return
 

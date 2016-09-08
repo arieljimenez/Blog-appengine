@@ -1,7 +1,6 @@
 
 function searchComments( user ) {
 
-
     $.ajax({
         url: "/comments",
         type: "GET",

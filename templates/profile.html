@@ -14,19 +14,19 @@
         <tbody>
             <tr>
                 <td class="profile-data"> Username </td>
-                <td><input type="text" name="username" value="{{ user_profile.user_name }}" disabled=""></td>
+                <td><input type="text" value="{{ user_profile.user_name }}" disabled></td>
             </tr>
             <tr>
                 <td> Mail </td>
-                <td><input type="text" name="username" value="{{ user_profile.user_mail }}" disabled=""></td>
+                <td><input type="text" value="{{ user_profile.user_mail }}" disabled></td>
             </tr>
             <tr>
                 <td> Comments </td>
-                <td><span class="round">{{ user_profile.comments }}</span></td>
+                <td><span class="round"><a href="javascript:searchComments('{{ user_profile.user_name }}')">{{ user_profile.comments }}</a></span></td>
             </tr>
             <tr>
                 <td>Posts</td>
-                <td><span class="round">{{ user_profile.posts }}</span></td>
+                <td><span class="round"><a href="/search/{{ user_profile.user_name }}">{{ user_profile.posts }}</a></span></td>
             </tr>
         </tbody>
     </table>
@@ -34,6 +34,8 @@
     <div id="chart_div"></div>
 </div>
 
+<!-- SCRIPTS -->
+<script src="/js/profile.js"></script>
 <!-- Google Charts -->
 <script type="text/javascript">
     // Load the Visualization API and the corechart package.
