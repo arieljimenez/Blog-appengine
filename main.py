@@ -330,20 +330,13 @@ def setDisablePost(title_id):
 
 
 def update_comment(comment_id, updatedComment):
-    logging.error( updatedComment )
     comment = Comments.get_by_id(int(comment_id), get_dbkey())
-
     comment.post_comment = updatedComment
-
-
     comment.put()
 
     blog_comments = memcache.get("blog_comments")
     blog_comments[comment.post_title][comment_id] = comment
     memcache.set("blog_comments", blog_comments)
-
-    logging.error("finished of updating comment id %s" % comment_id)
-
 
 ############################################################################################################
 ###################################################### HANDLERS ############################################
@@ -449,7 +442,8 @@ class LogoutHandler(webapp2.RequestHandler):
     def get(self):
         next_url = self.request.headers.get('referer', '/')
         self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
-        self.redirect(str(next_url))
+        #self.redirect(str(next_url))
+        self.redirect("/")
 
 
 
@@ -774,11 +768,6 @@ class DisableHandler(Handler):
         self.redirect("/")
 
 
-class PostHandler(Handler):
-    def get(self):
-        pass
-
-
 class AdminPanel(Handler):
     def render_panel(self):
         user_cookie_str = self.request.cookies.get('user_id')
@@ -815,9 +804,6 @@ class AdminPanel(Handler):
             if not p.state:
                 disabled_posts[p.title] = p
 
-        logging.error( disabled_posts )
-
-
         self.render("admin_panel.html",
                     posts       = None,
                     user        = u,
@@ -839,8 +825,6 @@ class SearchHandler(Handler):
             posts = memcache.get("blog_posts")
 
             query = query[1:].lower().replace("_", " ")
-
-            logging.error( query )
 
             for key, p in posts.iteritems():
                 if p.state and query in p.title.lower() or query in p.topic.lower() or query in p.content.lower():
@@ -910,17 +894,13 @@ class CommentsHandler(Handler):
             comment_id = self.request.get('id')
             updatedComment = self.request.get('comment')
 
-            logging.error("id: %s  comment: %s" % (comment_id, updatedComment))
-
             update_comment(comment_id=comment_id, updatedComment=updatedComment)
 
             comments_json = json.dumps( {"status": True})
-            #logging.error( sorted(comments_json.iteritems()) )
 
             self.write( comments_json  )
 
             return
-
 
 
         page = self.request.get('page')
@@ -1020,7 +1000,6 @@ class CommentsHandler(Handler):
             #self.response.headers = {'Content-Type': 'application/json; charset=utf-8'}
             response = json.dumps({"operation": "success"})
             self.write(response)
-
 
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
