@@ -396,9 +396,6 @@ input, textarea {
     color: white;
 }
 
-
-
-/* ###################################### */
-/*
- las esquinas 1 y 3 seran las
-*/
+.search_item:nth-child(even) {
+    background-color: #dddddd;
+}

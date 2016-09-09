@@ -331,15 +331,16 @@ def update_comment(comment_id, updatedComment):
     memcache.set("blog_comments", blog_comments)
 
 def get_comments_by_user(user):
-    #blog_comments[comment.post_title][str(comment.key().id())] = comment
     comments = memcache.get("blog_comments")
+    matched_comments = {}
 
     for title, comment_id in comments.iteritems():
         for key, comment in comment_id.iteritems():
             if comment.user_name == user:
-                logging.error ( comment )
-
-
+                matched_comments[comment.created.strftime("%y-%m-%d %H:%M:%S.%f")] = {"title"   : comment.post_title,
+                                                                                      "comment" : comment.post_comment,
+                                                                                      "created" : comment.created.strftime("%b %d, %Y")}
+    return matched_comments
 
 
 ############################################################################################################
@@ -908,10 +909,10 @@ class CommentsHandler(Handler):
 
         elif action == "getCommentsUser":
             user = self.request.get('user')
-            comments = get_comments_by_user( user )
-
+            comments = get_comments_by_user(user)
+            comments = json.dumps( sorted(comments.iteritems()))
+            self.write (comments)
             return
-
 
         page = self.request.get('page')
 
