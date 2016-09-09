@@ -1,2 +1,60 @@
 
+.content {
+  display: flex;
+  flex-wrap: wrap;
+}
 
+@media screen and (max-width: 400px) {
+
+    body {
+        font-size: 0.8em;
+    }
+
+/*
+ * TOP
+ */
+    #headband {
+        width: 97%;
+        height: 100px;
+    }
+
+    .nav {
+        padding-top: 2px;
+        right: 0px;
+        font-size: 1em;
+    }
+
+    #search-box {
+        padding: 5px;
+    }
+
+/*
+ * MID
+ */
+    #main {
+        margin-top: 0px;
+    }
+    #ranking {
+        width: 100%;
+        padding: 5px;
+    }
+
+    #comm-posts {
+        padding: 0px;
+
+    }
+/*
+ * BOTTOM
+ */
+
+     .footer {
+        padding-top: 0px;
+        font-size: 0.8em;
+        padding-bottom: 15px;
+            }
+    .footer hr {
+        margin: 0px;
+        padding: 0px;
+    }
+
+}

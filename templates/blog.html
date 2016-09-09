@@ -7,7 +7,7 @@
         <title>{{ title }}</title>
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Prompt|Roboto|Indie+Flower|Slabo+27px" rel="stylesheet">
         <link rel="stylesheet" href="/css/blog.css">
-        <link rel="stylesheet" type="text/css" href="responsiveness.css">
+        <link rel="stylesheet" href="/css/responsiveness.css">
 
         <script src="/js/jquery-3.1.0.min.js"></script>
         {% if user_profile or chart %}
@@ -35,7 +35,7 @@
 
         <!-- headband -->
         <div id="headband">
-            <img src="/img/miku-headband.jpg" alt="headband">
+            <img class="responsive" src="/img/miku-headband.jpg" alt="headband">
         </div>
         <!-- /headband -->
 
@@ -53,7 +53,7 @@
             <ul id="search_items"></ul>
         </div>
 
-        <div id="main">
+        <div id="main" class="content">
         {% block content %}
 
             {% if topten_comm_posts %}
@@ -115,8 +115,8 @@
 
     {% endblock %}
     </div>
-        <hr>
         <div class="footer">
+        <hr>
             <p>[ Made with love in Python + AJAX + HTML & CCS ]</p>
         </div>
 
