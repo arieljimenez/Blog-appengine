@@ -9,12 +9,12 @@
                     {% if post.state %}
                         <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
                     {% else %}
-                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
+                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="enable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
                     {% endif %}
                 {% else %}
                     <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
                 {% endif %}
-                <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a> ({{ post.modified }} min/hours ago)</small>
+                <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a>&nbsp;({{ time_ago  }} ago)</small>
             </div>
             <div class="post-score">
                 <p>{{ post.views }} Views | <span id="comments-ammount">{{ post.comments }}</span> Comments</p>

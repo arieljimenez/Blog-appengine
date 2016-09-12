@@ -1,3 +1,5 @@
+import time
+
 from Handler import Handler
 
 from collections import OrderedDict
@@ -5,7 +7,7 @@ from collections import OrderedDict
 from google.appengine.api import memcache
 
 class MainHandler(Handler):
-    def render_post(self, post, title, u = None, comments = None, commentError = ""):
+    def render_post(self, post, title, u = None, comments = None, commentError = "", time_ago = ""):
 
         u = self.validate_user()
 
@@ -28,6 +30,26 @@ class MainHandler(Handler):
 
             page = "post.html"
 
+            modified_seg = time.mktime(post.modified.timetuple() )
+
+            seconds_ago = time.time() - modified_seg
+
+            if seconds_ago // (60*60*24*30) >= 1: # total of seconds of a month 60 * 60 * 24 * 30
+                time_ago = "%.0f months " % (seconds_ago // (60*60*24*30))
+
+            if (seconds_ago % (60*60*24*30)) // (60*60*24) >= 1: # total of seconds of a day  60 * 60 * 24
+                time_ago += "%.0f days " % ((seconds_ago % (60*60*24*30)) // (60*60*24))
+
+            if (seconds_ago % (60*60*24)) // 3600 >= 1: # total of seconds of a hour  60 * 60 * 24
+                time_ago += "%.0f hours " % ((seconds_ago % (60*60*24)) // 3600)
+
+            if time_ago == "" :
+                time_ago = "%.0f mins" % (seconds_ago // 60)
+
+            #time_ago = "%s months, %s days %s hours" % (time_ago // (60 * 60 * 24 * 30), time_ago // (60 * 60 * 24), time_ago // (60 * 60) )
+            #now = time.time() - time.mktime(post.modified.timetuple() ) + post.modified.microsecond
+            #t= timedelta( time.time(), (time.mktime(post.modified.timetuple() ) + post.modified.microsecond))
+
         else:
             page = "blog.html"
             self.calc_posts_statics("views")
@@ -42,7 +64,8 @@ class MainHandler(Handler):
                     commentError = commentError,
                     topten_comm_posts = topten_comm_posts,
                     topten_view_posts = topten_view_posts,
-                    query = "")
+                    query = "",
+                    time_ago = time_ago)
 
 
     def get(self, title="/"):
