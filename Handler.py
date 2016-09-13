@@ -213,7 +213,7 @@ class Handler(webapp2.RequestHandler):
 
         #rankings
         time_spend = time.time()
-        calc_posts_statics()
+        self.calc_posts_statics()
         logging.error("took %s caching the posts rankings" % (time.time() - time_spend))
 
         total_activity = 0

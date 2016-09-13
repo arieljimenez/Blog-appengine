@@ -83,12 +83,11 @@ input, textarea {
 }
 
 #no-post {
+    margin: 0 auto;
     height: 300px;
 }
 
-#no-post h3 {
-    padding-top: 100px;
-}
+
 
 #chart_div {
     right: 0px;
