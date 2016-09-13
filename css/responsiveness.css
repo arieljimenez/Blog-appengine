@@ -4,10 +4,12 @@
   flex-wrap: wrap;
 }
 
+
 @media screen and (min-width: 0px) {
 
     body {
         font-size: 0.8em;
+        min-width: 325px;
     }
 
 /** TOP **/
@@ -15,6 +17,8 @@
         width: 97%;
         height: 100px;
     }
+
+
 
     .nav {
         padding-top: 3px;
@@ -110,12 +114,12 @@
 }
 
 @media screen and (max-width: 316px) {
-    #headband, #headband img{
-        width: 100%;
-        height: auto;
+    #headband {
         background-color: white;
     }
+
 }
+
 @media screen and (min-width: 451px) {
 
     body {
@@ -131,7 +135,6 @@
     .nav {
         padding-top: 5px;
     }
-
 }
 
 @media screen and (min-width: 550px) {
