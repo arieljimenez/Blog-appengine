@@ -16,20 +16,21 @@
     </head>
     <body>
         <!-- menu -->
-        <ul class="nav">
-            {% if user.user_name %}
-                <li><a href="/post/new">New Post</a> | </li>
-                <li><a href="/">Home </a>|</li>
-                {% if user.user_type == "admin" %}
-                    <li><a href="/adminpanel">Admin Panel</a> | </li>
+            <ul class="nav">
+                {% if user.user_name %}
+                    <li><a href="/post/new">New Post</a> | </li>
+                    <li><a href="/">Home </a>|</li>
+                    {% if user.user_type == "admin" %}
+                        <li><a href="/adminpanel">Admin Panel</a> | </li>
+                    {% endif %}
+                    <li><a id="user" href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a class="error" href="/logout"> (Logout)</a></li>
+                {% else %}
+                    <li><a href="/">Home </a>|</li>
+                    <li><a href="/login">Login </a>|</li>
+                    <li><a href="/signup"> Signup</a></li>
                 {% endif %}
-                <li><a id="user" href="/user/{{ user.user_name }}">{{ user.user_name }}</a> <a class="error" href="/logout"> (Logout)</a></li>
-            {% else %}
-                <li><a href="/">Home </a>|</li>
-                <li><a href="/login">Login </a>|</li>
-                <li><a href="/signup"> Signup</a></li>
-            {% endif %}
-        </ul>
+            </ul>
+
         <br>
         <!-- /menu -->
 
@@ -64,6 +65,7 @@
                         <tbody>
                             <tr>
                                 <th class="title"> Title (Topic)</th>
+                                <th class="date-col text-center">Date</th>
                                 <th class="text-center"> Owner </th>
                                 <th class="text-center"> Comments  </th>
                             </tr>
@@ -71,6 +73,7 @@
                                 {% if p[2].state %}
                                 <tr>
                                     <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                                    <td class="text-center date-col">{{ p[2].modified.strftime('%d-%m-%y') }}</td>
                                     <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                                     <td class="text-center">{{ p[2].comments }} </td>
                                 </tr>
@@ -87,6 +90,7 @@
                         <tbody>
                             <tr>
                                 <th class="title"> Title (Topic)</th>
+                                <th class="date-col text-center">Date</th>
                                 <th class="text-center"> Owner </th>
                                 <th class="text-center"> Views </th>
                             </tr>
@@ -94,6 +98,7 @@
                                 {% if p[2].state %}
                                 <tr>
                                     <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                                    <td class="text-center date-col">{{ p[2].modified.strftime('%d-%m-%y') }}</td>
                                     <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
                                     <td class="text-center"> {{ p[2].views }}</td>
                                 </tr>
