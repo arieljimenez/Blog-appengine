@@ -106,6 +106,16 @@
 </div>
 <!-- Google Charts -->
 <script type="text/javascript">
+
+    /* google.charts.load() cannot be called more than once with version 44 or earlier.
+    */
+    var width_w = $( 'body' ).width();
+    $( window ).resize(function() {
+        width_w = $( 'body' ).width();
+        drawChart();
+    });
+
+    //width_w = $( 'body' ).width();
     // Load the Visualization API and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
 
@@ -116,27 +126,26 @@
     // instantiates the pie chart, passes in the data and
     // draws it.
     function drawChart() {
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Topics Count');
+        data.addRows([
+            {% for name, value in topics.items() %}
+            ['{{ name }}', {{ value }}]{% if loop.index < topics|length %},{% endif %}
+            {% endfor %}
+        ]);
 
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Topics Count');
-    data.addRows([
-        {% for name, value in topics.items() %}
-        ['{{ name }}', {{ value }}]{% if loop.index < topics|length %},{% endif %}
-        {% endfor %}
-    ]);
+        // Set chart options
+        var options = {'title':'Topics statics',
+                       'width': width_w,
+                       'height': 300};
 
-    // Set chart options
-    var options = {'title':'Topics statics',
-                   'width':800,
-                   'height':400};
-
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-    var chart_col = new google.visualization.ColumnChart(document.getElementById('chart_div_col'));
-    chart.draw(data, options);
-    chart_col.draw(data, options);
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart_col = new google.visualization.ColumnChart(document.getElementById('chart_div_col'));
+        chart.draw(data, options);
+        chart_col.draw(data, options);
     }
 </script>
 {% endblock %}
