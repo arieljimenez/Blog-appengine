@@ -18,8 +18,6 @@
         height: 100px;
     }
 
-
-
     .nav {
         padding-top: 3px;
         right: 0px;
@@ -84,8 +82,8 @@
     textarea.comment, form.comment {
         padding: 10px;
     }
-/* new post form */
 
+/* new post form */
     .form {
         width: 100%;
         padding: 10px;
@@ -100,6 +98,28 @@
         padding-top: 15px;
     }
 
+/* login */
+    /*.login-page {
+        width: 100%;
+        padding: 10px;
+    }*/
+
+    .login-form {
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+    .login-form input,
+    .login-form button {
+        font-size: 1.8em;
+    }
+
+    .login-form p {
+        font-size: 1em;
+    }
+
+
+
 /** BOTTOM **/
      .footer {
         padding-top: 0px;
@@ -112,6 +132,8 @@
         padding: 0px;
     }
 }
+
+
 
 @media screen and (max-width: 316px) {
     #headband {
@@ -135,6 +157,8 @@
     .nav {
         padding-top: 5px;
     }
+
+
 }
 
 @media screen and (min-width: 550px) {
@@ -168,6 +192,25 @@
         display: inline;
         font-size: 0.8em;
     }
+
+    .error {
+        font-size: 1em;
+    }
+
+/* login */
+    .login-page {
+        max-width: 560px;
+        margin: 0 auto;
+    }
+
+    .login-form input,
+    .login-form button {
+        font-size: 1em;
+    }
+
+
+
+
 
 }
 

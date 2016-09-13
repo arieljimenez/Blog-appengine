@@ -2,17 +2,20 @@
 
 <html>
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Login</title>
         <link rel="stylesheet" href="/css/login.css">
+        <link rel="stylesheet" href="/css/responsiveness.css">
   </head>
   <body>
 
   {% block content %}
 
     <div class="login-page">
-      <div class="form">
         <form class="login-form"  method="post">
-          <p>Login to the Blog</p>
+          <h1 style="text-decoration:none">Login to the Blog</h1>
           <hr>
           <input type="text"  name="username" value="{{user}}" placeholder="username"/>
           <small class="error">{{ userError | safe }}</small>
@@ -22,7 +25,6 @@
           <p class="message">Not registered? <a href="/signup">Create an account</a></p>
           <input type="hidden" name="next_url" value="{{next_url}}">
         </form>
-      </div>
     </div>
 
     {% endblock %}
