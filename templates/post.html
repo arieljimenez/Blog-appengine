@@ -1,53 +1,55 @@
 {% extends "blog.html" %}
 
 {% block content %}
-<hr>
-    <div class="post round">
-        <div class="post-header">
-            <div class="post-data">
-                {% if user.user_type == "admin" %}
-                    {% if post.state %}
-                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
-                    {% else %}
-                        <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="enable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
-                    {% endif %}
+
+<div class="post round">
+    <div class="post-header">
+        <div class="post-data">
+            {% if user.user_type == "admin" %}
+                {% if post.state %}
+                    <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="disable"> ( <a href="/disable/{{ post.key().id() }}"> Disable </a> ) </span></h3>
                 {% else %}
-                    <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+                    <h3> {{ post.title.replace("_", " ")[1:] }} &nbsp; <span class="enable"> ( <a href="/disable/{{ post.key().id() }}"> Enable </a> ) </span></h3>
                 {% endif %}
-                <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a>&nbsp;({{ time_ago  }} ago)</small>
-            </div>
-            <div class="post-score">
-                <p>{{ post.views }} Views | <span id="comments-ammount">{{ post.comments }}</span> Comments</p>
-            </div>
+            {% else %}
+                <h3>{{ post.title.replace("_", " ")[1:] }}</h3>
+            {% endif %}
+            <small>Submited by <a href="/user/{{ post.user }}" class="user_name">{{ post.user }} </a> in <a href="/search/{{ post.topic }}" class="topic">{{ post.topic }}</a>&nbsp;({{ time_ago  }} ago)</small>
         </div>
-        <div class="post-content">
-            <p>{{ post.content }}</p>
+        <div class="post-score">
+            <p id="views-ammount">{{ post.views }} Views </p>
+            <span class="score-div">|</span>
+            <p id="comments-ammount">{{ post.comments }} Comments</p>
         </div>
-        <hr>
-        <!-- COMMENTS -->
-        <h3>Comments:</h3>
-
-        {% if user %}
-        <div class="user-comments">
-            <form class="comment" method="post">
-                <h4>{{ user.user_name }}:</h4>
-                <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment"></textarea>
-                <button class="round" type="submit">create</button>
-                <div id="comment-error" class="error"></div>
-            </form>
-        </div>
-        {% else %}
-        <div class="user-comments">
-            <h2>You must <a href="/login">login</a> to leave a comment.</h2>
-        </div>
-        {% endif %}
-        <div class="post-comments">
-            <h4>L o a d i n g &nbsp;&nbsp;&nbsp;c o m m e n t s . . . </h4>
-        </div>
-        <button id='load-more-comments' class='more-comments'>Load more comments</button>
-
-
     </div>
+    <div class="post-content">
+        <p>{{ post.content }}</p>
+    </div>
+    <hr>
+    <!-- COMMENTS -->
+    <h3>Comments:</h3>
+
+    {% if user %}
+    <div class="user-comments">
+        <form class="comment" method="post">
+            <h4>{{ user.user_name }}:</h4>
+            <textarea class="tarea-comments" name="comment" class="tarea-comments" placeholder="Add a comment"></textarea>
+            <button class="round" type="submit">create</button>
+            <div id="comment-error" class="error"></div>
+        </form>
+    </div>
+    {% else %}
+    <div class="user-comments">
+        <h2>You must <a href="/login">login</a> to leave a comment.</h2>
+    </div>
+    {% endif %}
+    <div class="post-comments">
+        <h4>L o a d i n g &nbsp;&nbsp;&nbsp;c o m m e n t s . . . </h4>
+    </div>
+    <button id='load-more-comments' class='more-comments'>Load more comments</button>
+
+
+</div>
 
 <!-- SCRIPTS FOR THIS TEMPLATE -->
 <script src="/js/comments.js"></script>

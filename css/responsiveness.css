@@ -27,6 +27,7 @@
     }
 
 /** MID **/
+/* Blog & AdminPanel */
     #main {
         margin-top: 0px;
     }
@@ -43,6 +44,43 @@
     .date-col {
         display: hidden;
     }
+
+/* Post */
+    .post {
+        width: 100%;
+        margin: 0 5px 5px 5px;
+    }
+
+    .post-data {
+        width: 70%;
+    }
+
+    .post-data small {
+        font-size: 0.75em;
+    }
+
+    .post-score {
+        width: 30%;
+        display: inline;
+        margin: 5px 0 5px 0;
+    }
+
+    .post-score p {
+        margin: 0;
+    }
+
+    .score-div {
+        display: none;
+    }
+
+    hr {
+        margin: 10px 0 10px 0;
+    }
+
+    textarea.comment, form.comment {
+        padding: 10px;
+    }
+
 
 /** BOTTOM **/
      .footer {
@@ -98,6 +136,16 @@
         padding: 5px 10px 10px 10px;
     }
 
+    .post-score {
+        margin-top: 20px;
+        width: 40%;
+    }
+
+    .post-score * {
+        display: inline;
+        font-size: 0.8em;
+    }
+
 }
 
 @media screen and (min-width: 700px) {
@@ -132,6 +180,10 @@
         width: 50%;
         background-color: rgba(0, 0, 0, 0.1);
     }
+
+    .post {
+        padding: 0px;
+    }
 }
 
 @media screen and (min-width: 960px) {
@@ -146,5 +198,9 @@
         right: inherit;
         float: right;
         position: relative;
+    }
+
+    textarea.comment {
+        font-size: 1em;
     }
 }

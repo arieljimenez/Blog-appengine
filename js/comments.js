@@ -27,7 +27,7 @@ function loadComments() {
             commentsLeftToShow = data.length;
             rationalizeComments ();
 
-            $("#comments-ammount").text( Object.keys( data ).length );
+            $("#comments-ammount").text( (Object.keys( data ).length) + " Comments" );
 
         } else {
              $postComments.append( "<span>Be the <strong>first</strong> in comment this post! :D</span>");
