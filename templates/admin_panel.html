@@ -7,103 +7,107 @@
     <div id="chart_div_col" class="center"></div>
 </div>
 <br>
-<h1> Post Ranking </h1>
-<hr>
-<br>
-<div class="most-pp">
-    <h2 class="center">Most popular posts</h2>
-    <table class="ranking-posts">
-        <tbody>
-            <tr class="text-center">
-                <th>Rank</th>
-                <th>Title</th>
-                <th>Owner</th>
-                <th>Date</th>
-                <th>Comments</th>
-                <th>Action</th>
-            </tr>
+<div id="ranking">
+    <h1> Post Ranking </h1>
+    <br>
+    <div class="most-pp">
+        <h2 class="center">Most popular posts</h2>
+        <table class="ranking-posts">
+            <tbody>
+                <tr class="text-center">
+                    <th>Rank</th>
+                    <th>Title (Topic)</th>
+                    <th class="date-col">Owner</th>
+                    <th class="date-col">Date</th>
+                    <th>Comm.</th>
+                    <th>Act.</th>
+                </tr>
 
-    {% for p in topten_comm_posts %}
-        {% if loop.index > 5 %}
-            <tr class="out-rank">
-        {% else %}
-            <tr>
-        {% endif %}
-                <td class="center">{{ loop.index }}</td>
-                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
-                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
-                <td class="text-center"> {{ p[2].modified }}</td>
-                <td class="text-center"> {{ p[2].comments }}</td>
-                {% if p[2].state %}
-                    <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
-                {% else %}
-                    <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
-                {% endif %}
-            </tr>
-    {% endfor %}
-
-        </tbody>
-    </table>
-</div>
-<br>
-<div class="most-vp">
-    <h2 class="center">Hot posts</h2>
-    <table class="ranking-posts">
-        <tbody>
-            <tr class="text-center">
-                <th>Rank</th>
-                <th>Title</th>
-                <th>Owner</th>
-                <th>Date</th>
-                <th>Views</th>
-            </tr>
-
-    {% for p in topten_view_posts %}
-
-        {% if loop.index > 5 %}
-            <tr class="out-rank">
-        {% else %}
-            <tr>
-        {% endif %}
-                <td class="center">{{ loop.index }}</td>
-                <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
-                <td class="text-center"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
-                <td class="text-center"> {{ p[2].modified }}</td>
-                <td class="text-center"> {{ p[2].views }}</td>
-
-                {% if p[2].state %}
-                    <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"> Disable </a></td>
-                {% else %}
-                    <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"> Enable </a></td>
-                {% endif %}
-            </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-<br>
-<div class='disabled-post'>
-    <h2 class='center'>Disabled Posts</h2>
-    <table class='ranking-posts'>
-        <tbody>
-            <tr class='text-center'>
-                <th>Title</th>
-                <th>Owner</th>
-                <th>Date</th>
-                <th>Views</th>
-            </tr>
-        {% for title, p in disabled_posts.iteritems() %}
-            <tr>
-                <td> <a href='/post{{ title }}'>{{ title.replace('_', ' ')[1:] }}</a></td>
-                <td class='text-center'> <a href='/user/{{ p.user }}'>{{ p.user }} </a></td>
-                <td class='text-center'> {{ p.modified }}</td>
-                <td class='text-center'> {{ p.views }}</td>
-                <td class='enable center'> <a href='/disable/{{ p.key().id() }}'> Enable </a></td>
-            </tr>
+        {% for p in topten_comm_posts %}
+            {% if loop.index > 5 %}
+                <tr class="out-rank">
+            {% else %}
+                <tr>
+            {% endif %}
+                    <td class="center">{{ loop.index }}</td>
+                    <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                    <td class="text-center date-col"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                    <td class="text-center date-col"> {{ p[2].modified.strftime('%d-%m-%y') }}</td>
+                    <td class="text-center"> {{ p[2].comments }}</td>
+                    {% if p[2].state %}
+                        <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"> <b>[ &#9671; ]</b></a></td>
+                    {% else %}
+                        <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"> <b>[ &#9670; ]</b> </a></td>
+                    {% endif %}
+                </tr>
         {% endfor %}
-        </tbody>
-    </table>
+
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class="most-vp">
+        <h2 class="center">Hot posts</h2>
+        <table class="ranking-posts">
+            <tbody>
+                <tr class="text-center">
+                    <th>Rank</th>
+                    <th>Title</th>
+                    <th class="date-col">Owner</th>
+                    <th class="date-col">Date</th>
+                    <th>Views</th>
+                </tr>
+
+        {% for p in topten_view_posts %}
+
+            {% if loop.index > 5 %}
+                <tr class="out-rank">
+            {% else %}
+                <tr>
+            {% endif %}
+                    <td class="center">{{ loop.index }}</td>
+                    <td> <a href="/post{{ p[0] }}">{{ p[0].replace("_", " ")[1:] }}</a><small> (in <a href="/search/{{ p[2].topic.replace(' ', '_') }}">{{ p[2].topic }}</a>)</small></td>
+                    <td class="text-center date-col"> <a href="/user/{{ p[2].user }}">{{ p[2].user }} </a></td>
+                    <td class="text-center date-col"> {{ p[2].modified.strftime('%d-%m-%y') }}</td>
+                    <td class="text-center"> {{ p[2].views }}</td>
+
+                    {% if p[2].state %}
+                        <td class="disable center"> <a href="/disable/{{ p[2].key().id() }}"><b>[ &#9671; ]</b></a></td>
+                    {% else %}
+                        <td class="enable center"> <a href="/disable/{{ p[2].key().id() }}"><b>[ &#9670; ]</b></a></td>
+                    {% endif %}
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    {% if disabled_posts %}
+    <div class='disabled-post'>
+        <h2 class='center'>Disabled Posts</h2>
+        <table class='ranking-posts'>
+            <tbody>
+                <tr class='text-center'>
+                    <th>Title</th>
+                    <th class="date-col">Owner</th>
+                    <th class="date-col">Date</th>
+                    <th>Com./Vie.</th>
+                </tr>
+            {% for title, p in disabled_posts.iteritems() %}
+                <tr>
+                    <td> <a href='/post{{ title }}'>{{ title.replace('_', ' ')[1:] }}</a></td>
+                    <td class='text-center date-col'> <a href='/user/{{ p.user }}'>{{ p.user }} </a></td>
+                    <td class='text-center date-col'> {{ p.modified.strftime('%d-%m-%y') }}</td>
+                    <td class='text-center'> {{ p.comments }} / {{ p.views }}</td>
+                    <td class='enable center'> <a href='/disable/{{ p.key().id() }}'><b>[ &#9670; ]</b></a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </div>
+
 <!-- Google Charts -->
 <script type="text/javascript">
 

@@ -43,10 +43,10 @@
         padding: 0px;
     }
 
-    .date-col {
+    /*.date-col {
         display: hidden;
     }
-
+*/
 /* Post */
     .post {
         width: 100%;
@@ -206,7 +206,7 @@
     .login-form input,
     .login-form button {
         font-size: 1em;
-    }S
+    }
 
 }
 
@@ -222,7 +222,7 @@
     }
 
     .date-col {
-        display: block;
+        display: table-cell;
     }
 
 }

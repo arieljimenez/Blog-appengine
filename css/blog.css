@@ -230,6 +230,7 @@ input, textarea {
 .enable {
     color: darkgreen;
     font-weight: 500;
+    font-weight: 500;
 }
 
 .post {
@@ -315,33 +316,11 @@ input, textarea {
 }
 
 
-.ranking-posts {
-    width: 100%;
-    border: 1px solid;
-    border-collapse: collapse
-    padding: 5px;
-    text-align: left;
-    display: table;
-}
-
-.ranking-posts tr:nth-child(even) {
-    background-color: #dddddd;
-}
-
 .text-center { text-align: center; }
 .disable { color: gray; }
+
 .underline { text-decoration: underline; }
 .indie-font { font-family: "Indie Flower"; }
-
-.out-rank {
-    background-color: gray;
-    color: white;
-}
-
-.out-rank td {
-    background-color: gray;
-    color: white;
-}
 
 .search-form {
     display: flex;
@@ -414,3 +393,51 @@ input, textarea {
 .date-col {
   display: none;
 }
+
+/* ADMIN PANEL */
+
+.chart {
+  width: 100%;
+}
+
+#ranking {
+  width: 100%;
+  background-color: cornsilk;
+}
+
+.ranking-posts {
+    background-color: ghostwhite;
+    width: 100%;
+    border: 1px solid;
+    border-collapse: collapse
+    padding: 5px;
+    text-align: left;
+    display: table;
+}
+
+.ranking-posts tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.out-rank {
+    background-color: gray;
+    color: white;
+}
+
+.out-rank td {
+    background-color: gray;
+    color: white;
+}
+
+.most-vp {
+  background-color: darkseagreen;
+  padding: 3px;
+}
+
+.disabled-post {
+  background-color: darkgray;
+  padding: 3px;
+}
+
+
+
