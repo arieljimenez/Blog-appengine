@@ -46,7 +46,7 @@ app = webapp2.WSGIApplication([('/',             MainHandler),
                                ('/adminpanel/?', AdminPanel),
                                ('/post/new/?',   NewPost),
                                ('/post'        + PAGE_RE, MainHandler),
-                               ('/disable/'    + NUM_RE, DisableHandler),
+                               ('/disable',      DisableHandler),
                                ('/comments',     CommentsHandler),
                                (PAGE_RE,         MainHandler),
                                 ], debug=True)

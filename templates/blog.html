@@ -10,9 +10,9 @@
         <link rel="stylesheet" href="/css/responsiveness.css">
 
         <script src="/js/jquery-3.1.0.min.js"></script>
-        {% if user_profile or chart %}
-            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        {% endif %}
+    {% if user_profile or chart %}
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    {% endif %}
     </head>
     <body>
         <!-- menu -->
@@ -30,16 +30,14 @@
                     <li><a href="/signup"> Signup</a></li>
                 {% endif %}
             </ul>
-
         <br>
-        <!-- /menu -->
 
         <!-- headband -->
         <div id="headband">
             <img class="responsive" src="/img/miku-headband.jpg" alt="headband">
         </div>
-        <!-- /headband -->
 
+        <!-- search box -->
         <div id="search-box">
             <form id="search-form" class='search-form'>
             {% if query %}
@@ -54,6 +52,7 @@
             <ul id="search_items"></ul>
         </div>
 
+        <!-- MAIN -->
         <div id="main" class="content">
         {% block content %}
 

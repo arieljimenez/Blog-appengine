@@ -157,13 +157,22 @@ class Handler(webapp2.RequestHandler):
     def make_cache(self):
         ############ posts
         blog_posts = {}
+        disabled_posts_json = []
 
         time_spend = time.time()
         posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1", self.get_dbkey())
 
-        for p in posts:
-            blog_posts[str(p.key().id())] = p
+        for post in posts:
+            blog_posts[str(post.key().id())] = post
 
+            if not post.state:
+                disabled_posts_json.append([str(post.key().id()), {"title": post.title,
+                                                             "topic": post.topic,
+                                                             "comments": post.comments,
+                                                             "user": post.user,
+                                                             "modified": post.modified.strftime('%d-%m-%y') }])
+
+        memcache.set("disabled_posts_json", disabled_posts_json)
         memcache.set("blog_posts", blog_posts)
         logging.error("took %s caching all the %s posts " % (time.time() - time_spend, len(blog_posts)))
 
@@ -269,6 +278,7 @@ class Handler(webapp2.RequestHandler):
 
         if calc == "comments" or calc == "all":
             topten_comm_posts = []
+            topten_comm_posts_json = []
             comments = memcache.get("blog_comments")
 
             comm_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1  ORDER BY comments DESC LIMIT 10",  self.get_dbkey())
@@ -279,28 +289,65 @@ class Handler(webapp2.RequestHandler):
 
                 topten_comm_posts.append([post.title, post.comments, post])
 
+                topten_comm_posts_json.append([str(post.key().id()), { "title": post.title,
+                                                                "topic": post.topic,
+                                                                "comments": post.comments,
+                                                                "user": post.user,
+                                                                "modified": post.modified.strftime('%d-%m-%y') }])
+
             memcache.set("topten_comm_posts", topten_comm_posts)
+            memcache.set("topten_comm_posts_json", topten_comm_posts_json)
+
 
 
         if calc == "views" or calc == "all":
             topten_view_posts = []
+            topten_view_posts_json = []
             view_posts = db.GqlQuery("SELECT * FROM Blog_Posts WHERE ANCESTOR IS :1  ORDER BY views DESC LIMIT 10",  self.get_dbkey())
 
             for post in view_posts:
                 topten_view_posts.append([post.title, post.views, post])
 
+                topten_view_posts_json.append([str(post.key().id()), { "title": post.title,
+                                                                "topic": post.topic,
+                                                                "comments": post.comments,
+                                                                "user": post.user,
+                                                                "modified": post.modified.strftime('%d-%m-%y') }])
+
             memcache.set("topten_view_posts", topten_view_posts)
+            memcache.set("topten_view_posts_json", topten_view_posts_json)
 
 
-    def setDisablePost(self, title_id):
+    def swap_post_state(self, title_id):
         posts = memcache.get("blog_posts")
         post = posts[title_id]
         post.state = not post.state
         post.put()
 
+        disabled_posts_json = memcache.get("disabled_posts_json")
+
+        #if any(title_id in disabled_posts_json[x] for x in xrange(0, len(disabled_posts_json)-1)):
+        tim = time.time()
+        for i in xrange(0, len(disabled_posts_json)-1):
+            if title_id in disabled_posts_json[i]:
+                del disabled_posts_json[i]
+                break
+            else:
+                if not post.state:
+                    disabled_posts_json.append([title_id, { "title": post.title,
+                                                     "topic": post.topic,
+                                                     "comments": post.comments,
+                                                     "user": post.user,
+                                                     "modified": post.modified.strftime('%d-%m-%y') }])
+
+        memcache.set("disabled_posts_json", disabled_posts_json)
+        logging.error( time.time() - tim)
+
         self.calc_posts_statics("comments")
+
         memcache.set("blog_posts", posts)
-        return post
+
+        return posts
 
     def update_comment(self, comment_id, updatedComment):
         comment = Comments.get_by_id(int(comment_id), self.get_dbkey())
